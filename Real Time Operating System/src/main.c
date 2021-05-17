@@ -32,26 +32,29 @@ SOFTWARE.
 #include "stm32f4xx.h"
 #include "rtos.h"
 
-RTOS_list_t RTOS_list;
-RTOS_listItem_t RTOS_listItem[5];
+void func_1(void)
+{
+	while(1);
+}
+
+void func_2(void)
+{
+	while(1);
+}
+
+void func_3(void)
+{
+	while(1);
+}
+
+RTOS_thread_t thread[3];
+RTOS_stack_t stack[3];
 
 int main(void)
 {
-
-	RTOS_listInit(&RTOS_list);
-
-	RTOS_listAppend(&RTOS_list, &RTOS_listItem[0]);
-	RTOS_listAppend(&RTOS_list, &RTOS_listItem[2]);
-
-	RTOS_listRemove(&RTOS_list, &RTOS_listItem[0]);
-	RTOS_listRemove(&RTOS_list, &RTOS_listItem[2]);
-
-	RTOS_listAppend(&RTOS_list, &RTOS_listItem[0]);
-	RTOS_listAppend(&RTOS_list, &RTOS_listItem[1]);
-	RTOS_listAppend(&RTOS_list, &RTOS_listItem[2]);
-	RTOS_listAppend(&RTOS_list, &RTOS_listItem[3]);
-	RTOS_listAppend(&RTOS_list, &RTOS_listItem[4]);
-
-
+	RTOS_threadReadyListsInit();
+	RTOS_threadCreate(&thread[0], &stack[0], func_1, 1);
+	RTOS_threadCreate(&thread[1], &stack[1], func_2, 1);
+	RTOS_threadCreate(&thread[2], &stack[2], func_3, 4);
 	while(1);
 }

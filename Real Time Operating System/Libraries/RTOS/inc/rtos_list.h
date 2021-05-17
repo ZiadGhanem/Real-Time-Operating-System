@@ -8,11 +8,11 @@
 #ifndef RTOS_INC_RTOS_LIST_H_
 #define RTOS_INC_RTOS_LIST_H_
 
-#include <stdint.h>
 
 /** RTOS list item
  * pNext -> Pointer to the next item in the list
  * pPrev -> Pointer to the previous item in the list
+ * pList -> Pointer to the container of this list item
  * pThread -> Pointer to the thread of this item
  */
 struct listItem_t{
@@ -41,13 +41,13 @@ typedef struct{
 typedef struct{
 	RTOS_listItem_t* pIndex;
 	RTOS_listEndItem_t endItem;
-	int32_t numListItems;
+	uint32_t numListItems;
 }RTOS_list_t;
 
 
-void RTOS_listInit(RTOS_list_t* RTOS_list);
-void RTOS_listAppend(RTOS_list_t* RTOS_list, RTOS_listItem_t* RTOS_listItem);
-void RTOS_listRemove(RTOS_list_t* RTOS_list, RTOS_listItem_t* RTOS_listItem);
+void RTOS_listInit(RTOS_list_t* pList);
+void RTOS_listAppend(RTOS_list_t* pList, RTOS_listItem_t* pListItem);
+void RTOS_listRemove(RTOS_list_t* pList, RTOS_listItem_t* pListItem);
 
 
 
