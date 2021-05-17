@@ -28,42 +28,30 @@ SOFTWARE.
 */
 
 /* Includes */
-#include <stddef.h>
+#include <stdint.h>
 #include "stm32f4xx.h"
+#include "rtos.h"
 
-/* Private macro */
-/* Private variables */
-/* Private function prototypes */
-/* Private functions */
+RTOS_list_t RTOS_list;
+RTOS_listItem_t RTOS_listItem[5];
 
-/**
-**===========================================================================
-**
-**  Abstract: main program
-**
-**===========================================================================
-*/
 int main(void)
 {
-  int i;
-  SystemCoreClockUpdate();
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG, ENABLE);
-  GPIO_Init(GPIOG, &(GPIO_InitTypeDef){
-		(1 << 13),
-		GPIO_Mode_OUT,
-		GPIO_Speed_50MHz,
-		GPIO_OType_PP,
-		GPIO_PuPd_NOPULL
-  });
 
-  GPIO_ToggleBits(GPIOG, (1 << 13));
+	RTOS_listInit(&RTOS_list);
 
-  /* Infinite loop */
-  while (1)
-  {
-	for(i = 0; i < 180000000; i++)
-	{
-		GPIO_ToggleBits(GPIOG, (1 << 13));
-	}
-  }
+	RTOS_listAppend(&RTOS_list, &RTOS_listItem[0]);
+	RTOS_listAppend(&RTOS_list, &RTOS_listItem[2]);
+
+	RTOS_listRemove(&RTOS_list, &RTOS_listItem[0]);
+	RTOS_listRemove(&RTOS_list, &RTOS_listItem[2]);
+
+	RTOS_listAppend(&RTOS_list, &RTOS_listItem[0]);
+	RTOS_listAppend(&RTOS_list, &RTOS_listItem[1]);
+	RTOS_listAppend(&RTOS_list, &RTOS_listItem[2]);
+	RTOS_listAppend(&RTOS_list, &RTOS_listItem[3]);
+	RTOS_listAppend(&RTOS_list, &RTOS_listItem[4]);
+
+
+	while(1);
 }
