@@ -45,9 +45,6 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, void* pFunc
 	ASSERT(pFunction != NULL);
 	ASSERT((priority < MAX_PRIORITY_LEVEL) && (priority >= 0));
 
-	/* Disable interrupt requests during thread creation */
-	__disable_irq();
-
 	/* Stack: xPSR, PC, LR, R12, R3, R1, R1, R0 are automatically pushed,
 	 * 		 while the rest are pushed manually during thread switching
 	 * EXC_RETURN
@@ -115,7 +112,47 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, void* pFunc
 
 	}
 
-	/* Enable interrupts */
-	__enable_irq();
+}
+
+
+/*
+ * This function get the currently running thread
+ * Inputs:
+ *  None
+ * Return:
+ * 	Pointer to the running thread
+ */
+RTOS_thread_t* RTOS_threadGetRunning(void)
+{
+	return pCurrentlyRunningThread;
+}
+
+
+/*
+ * This function switches the currently running thread
+ * Inputs:
+ *  None
+ * Return:
+ * 	None
+ */
+void RTOS_threadSwitch(void)
+{
+	/* Check if the current top priority list became empty */
+	while(RTOS_readyList[currentTopPriority].numListItems == 0)
+	{
+		currentTopPriority++;
+	}
+
+	/* Get the next thread in the list */
+	RTOS_readyList[currentTopPriority].pIndex = RTOS_readyList[currentTopPriority].pIndex->pNext;
+
+	/* Check if the current index is the end item */
+	if(RTOS_readyList[currentTopPriority].pIndex == (RTOS_listItem_t*) &RTOS_readyList[currentTopPriority].endItem)
+	{
+		/* Increment the index */
+		RTOS_readyList[currentTopPriority].pIndex = RTOS_readyList[currentTopPriority].pIndex->pNext;
+	}
+
+	pCurrentlyRunningThread = RTOS_readyList[currentTopPriority].pIndex->pThread;
 
 }

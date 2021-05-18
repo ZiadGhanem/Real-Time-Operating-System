@@ -12,6 +12,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
+/* Scheduler frequency */
+#define SYSTICK_FREQUENCY	1000UL
 /* Number of allowed priority levels */
 #define MAX_PRIORITY_LEVEL	16UL
 /* Maximum process stack size in double words*/

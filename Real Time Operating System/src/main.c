@@ -42,19 +42,17 @@ void func_2(void)
 	while(1);
 }
 
-void func_3(void)
-{
-	while(1);
-}
-
-RTOS_thread_t thread[3];
-RTOS_stack_t stack[3];
+RTOS_thread_t thread[2];
+RTOS_stack_t stack[2];
 
 int main(void)
 {
-	RTOS_threadReadyListsInit();
-	RTOS_threadCreate(&thread[0], &stack[0], func_1, 1);
-	RTOS_threadCreate(&thread[1], &stack[1], func_2, 1);
-	RTOS_threadCreate(&thread[2], &stack[2], func_3, 4);
+	RTOS_init();
+
+	RTOS_SVC_threadCreate(&thread[0], &stack[0], func_1, 1);
+	RTOS_SVC_threadCreate(&thread[1], &stack[1], func_2, 1);
+
+	RTOS_SVC_schedulerStart();
+
 	while(1);
 }

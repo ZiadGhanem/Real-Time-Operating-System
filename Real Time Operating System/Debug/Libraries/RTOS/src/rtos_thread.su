@@ -1,2 +1,4 @@
 rtos_thread.c:24:6:RTOS_threadReadyListsInit	16	static
 rtos_thread.c:41:6:RTOS_threadCreate	24	static
+rtos_thread.c:125:16:RTOS_threadGetRunning	4	static
+rtos_thread.c:138:6:RTOS_threadSwitch	4	static

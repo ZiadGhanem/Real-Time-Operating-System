@@ -12,6 +12,7 @@
 #include "rtos_conf.h"
 #include "rtos_list.h"
 #include "rtos_thread.h"
+#include "rtos_scheduler.h"
 
 #define MEM32WORD(ADDRESS) (*((volatile uint32_t *)(ADDRESS)))
 
@@ -22,5 +23,7 @@
 		while(1);	\
 	}
 
+void RTOS_init(void);
+void RTOS_SVC_Handler_Main(uint32_t* svc_args);
 
 #endif /* RTOS_INC_RTOS_H_ */
