@@ -34,12 +34,22 @@ SOFTWARE.
 
 void func_1(void)
 {
-	while(1);
+	int i;
+	while(1)
+	{
+		GPIO_ToggleBits(GPIOG, (1 << 13));
+		for(i = 0; i < 2000000; i++);
+	}
 }
 
 void func_2(void)
 {
-	while(1);
+	int i;
+	while(1)
+	{
+		GPIO_ToggleBits(GPIOG, (1 << 14));
+		for(i = 0; i < 1000000; i++);
+	}
 }
 
 RTOS_thread_t thread[2];
@@ -47,6 +57,16 @@ RTOS_stack_t stack[2];
 
 int main(void)
 {
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOG, ENABLE);
+	GPIO_Init(GPIOG, &(GPIO_InitTypeDef){
+			(1 << 13) | (1 << 14),
+			GPIO_Mode_OUT,
+			GPIO_Speed_50MHz,
+			GPIO_OType_PP,
+			GPIO_PuPd_NOPULL
+	  });
+
+
 	RTOS_init();
 
 	RTOS_SVC_threadCreate(&thread[0], &stack[0], func_1, 1);
