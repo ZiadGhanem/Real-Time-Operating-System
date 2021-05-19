@@ -32,23 +32,47 @@ SOFTWARE.
 #include "stm32f4xx.h"
 #include "rtos.h"
 
+uint32_t ITM_PortSendChar(uint8_t port, uint32_t ch)
+{
+  if ((ITM->TCR & ITM_TCR_ITMENA_Msk)                  &&      /* ITM enabled */
+      (ITM->TER & (1UL << port)        )                    )     /* ITM Port #0 enabled */
+  {
+    while (ITM->PORT[port].u32 == 0);
+    ITM->PORT[port].u8 = (uint8_t) ch;
+  }
+  return (ch);
+}
+
+void ITM_PortPrintf(uint8_t port, char* str, uint32_t length)
+{
+	if(str != NULL)
+	{
+		for(int i = 0; i < length - 1; i++)
+		{
+			ITM_PortSendChar(port, *str);
+			str++;
+		}
+	}
+}
+
+
 void func_1(void)
 {
-	int i;
 	while(1)
 	{
 		GPIO_ToggleBits(GPIOG, (1 << 13));
-		for(i = 0; i < 2000000; i++);
+		//ITM_PortPrintf(31, "11", 2UL);
+		RTOS_SVC_threadDelay(500);
+		//ITM_PortPrintf(31, "12", 2UL);
 	}
 }
 
 void func_2(void)
 {
-	int i;
 	while(1)
 	{
 		GPIO_ToggleBits(GPIOG, (1 << 14));
-		for(i = 0; i < 1000000; i++);
+		RTOS_SVC_threadDelay(1000);
 	}
 }
 

@@ -25,13 +25,18 @@ typedef struct{
 	uint32_t pStack;
 	uint32_t priority;
 	RTOS_listItem_t listItem;
+	uint32_t threadId;
+	uint32_t delay_systicks;
 }RTOS_thread_t;
 
 extern void RTOS_SVC_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, void* pFunction, uint32_t priority);
-extern void RTOS_SVC_schedulerStart(void);
+extern void RTOS_SVC_threadDelay(uint32_t systicks);
+
 void RTOS_threadReadyListsInit(void);
 void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, void* pFunction, uint32_t priority);
 RTOS_thread_t* RTOS_threadGetRunning(void);
 void RTOS_threadSwitch(void);
+void RTOS_threadDelay(uint32_t systicks);
+void RTOS_threadUnblock(void);
 
 #endif /* RTOS_INC_RTOS_THREAD_H_ */

@@ -13,6 +13,10 @@ static uint32_t currentTopPriority = MAX_PRIORITY_LEVEL - 1;
 static RTOS_thread_t* pCurrentlyRunningThread = NULL;
 /* RTOS ready lists */
 static RTOS_list_t RTOS_readyList[MAX_PRIORITY_LEVEL];
+/* RTOS delayed list */
+static RTOS_list_t RTOS_delayList;
+/* Thread ID numbering */
+static uint32_t numThreads = 0;
 
 /*
  * This function initializes the ready lists
@@ -23,9 +27,13 @@ static RTOS_list_t RTOS_readyList[MAX_PRIORITY_LEVEL];
  */
 void RTOS_threadReadyListsInit(void)
 {
+	/* Initialize the ready lists */
 	uint32_t i;
 	for(i = 0; i < MAX_PRIORITY_LEVEL; i++)
 		RTOS_listInit(&RTOS_readyList[i]);
+
+	/* Initialize the delayed list */
+	RTOS_listInit(&RTOS_delayList);
 }
 
 /*
@@ -84,6 +92,13 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, void* pFunc
 
 	/* Set the priority level */
 	pThread->priority = priority;
+
+	/* Clear the delay amount */
+	pThread->delay_systicks = 0;
+
+	/* Set thread ID */
+	pThread->threadId = numThreads;
+	numThreads++;
 
 	/* Set the thread's list item thread pointer */
 	pThread->listItem.pThread = pThread;
@@ -155,4 +170,73 @@ void RTOS_threadSwitch(void)
 
 	pCurrentlyRunningThread = RTOS_readyList[currentTopPriority].pIndex->pThread;
 
+}
+
+/*
+ * This function delays the currently running thread
+ * Inputs:
+ *  systicks -> Number of system ticks to be delayed
+ * Return:
+ * 	None
+ */
+void RTOS_threadDelay(uint32_t systicks)
+{
+	/* Remove the current thread from ready list */
+	RTOS_listRemove(&RTOS_readyList[pCurrentlyRunningThread->priority], &pCurrentlyRunningThread->listItem);
+
+	/* Set the delay amount */
+	pCurrentlyRunningThread->delay_systicks = systicks;
+
+	/* Add the thread to the delayed list */
+	RTOS_listAppend(&RTOS_delayList, &pCurrentlyRunningThread->listItem);
+
+	/* Invoke a pendSV exception */
+    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+}
+
+/*
+ * This function checks if any of the blocked threads can be transferred to the ready list
+ * Inputs:
+ *  None
+ * Return:
+ * 	None
+ */
+void RTOS_threadUnblock(void)
+{
+	/* Check for delayed threads */
+	int i;
+	RTOS_listItem_t* pCurrentItem = RTOS_delayList.pIndex;
+	for(i = 0; i < RTOS_delayList.numListItems + 1; i++)
+	{
+		if(pCurrentItem != (RTOS_listItem_t*) &RTOS_delayList.endItem)
+		{
+			RTOS_thread_t* pCurrentThread = pCurrentItem->pThread;
+			if(pCurrentThread->delay_systicks > 0)
+			{
+				pCurrentThread->delay_systicks--;
+			}
+			else
+			{
+				/* Remove the current thread from delay list */
+				RTOS_listRemove(&RTOS_delayList, pCurrentItem);
+
+				/* Clear the delay amount */
+				pCurrentThread->delay_systicks = 0;
+
+				/* Check if the thread has a new highest priority */
+				if(pCurrentThread->priority < currentTopPriority)
+				{
+					currentTopPriority = pCurrentThread->priority;
+				}
+				else
+				{
+
+				}
+
+				/* Add the thread to the ready list */
+				RTOS_listAppend(&RTOS_readyList[pCurrentThread->priority], pCurrentItem);
+			}
+		}
+		pCurrentItem = pCurrentItem->pNext;
+	}
 }

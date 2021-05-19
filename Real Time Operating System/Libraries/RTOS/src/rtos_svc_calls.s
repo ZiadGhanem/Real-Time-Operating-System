@@ -11,6 +11,7 @@
 
  .global RTOS_SVC_schedulerStart
  .global RTOS_SVC_threadCreate
+ .global RTOS_SVC_threadDelay
 
 
  .text
@@ -20,8 +21,12 @@
 	SVC 0
 	BX LR
 
- .section .text.RTOS_SVC_threadCreate
  .type RTOS_SVC_threadCreate, %function
  RTOS_SVC_threadCreate:
 	SVC 1
 	BX LR
+
+ .type RTOS_SVC_threadDelay, %function
+ RTOS_SVC_threadDelay:
+ 	SVC 2
+ 	BX LR

@@ -1,4 +1,6 @@
-rtos_thread.c:24:6:RTOS_threadReadyListsInit	16	static
-rtos_thread.c:41:6:RTOS_threadCreate	24	static
-rtos_thread.c:125:16:RTOS_threadGetRunning	4	static
-rtos_thread.c:138:6:RTOS_threadSwitch	4	static
+rtos_thread.c:28:6:RTOS_threadReadyListsInit	16	static
+rtos_thread.c:49:6:RTOS_threadCreate	24	static
+rtos_thread.c:140:16:RTOS_threadGetRunning	4	static
+rtos_thread.c:153:6:RTOS_threadSwitch	4	static
+rtos_thread.c:182:6:RTOS_threadDelay	16	static
+rtos_thread.c:204:6:RTOS_threadUnblock	24	static

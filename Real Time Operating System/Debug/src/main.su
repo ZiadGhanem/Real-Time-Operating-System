@@ -1,3 +1,5 @@
-main.c:35:6:func_1	16	static
-main.c:45:6:func_2	16	static
-main.c:58:5:main	16	static
+main.c:35:10:ITM_PortSendChar	16	static
+main.c:46:6:ITM_PortPrintf	32	static
+main.c:59:6:func_1	8	static
+main.c:70:6:func_2	8	static
+main.c:82:5:main	16	static

@@ -49,7 +49,7 @@
 	/* Push {R2 -> R11} into the thread's stack*/
 	STMDB R1!, {R2-R11}
 	/* Save the thread's stack pointer */
-	BL RTOS_threadGetRunning;
+	BL RTOS_threadGetRunning
 	STR R1, [R0]
 
 	/****************** Restoring the next thread's context ********************/

@@ -9,6 +9,7 @@
 #define RTOS_INC_RTOS_SCHEDULER_H_
 
 
+extern void RTOS_SVC_schedulerStart(void);
 void RTOS_schedulerStart(void);
 void RTOS_SysTick_Handler(void);
 

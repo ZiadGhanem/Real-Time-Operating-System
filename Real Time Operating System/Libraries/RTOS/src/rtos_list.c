@@ -70,6 +70,7 @@ void RTOS_listRemove(RTOS_list_t* pList, RTOS_listItem_t* pListItem)
 {
 	ASSERT(pList != NULL);
 	ASSERT(pListItem != NULL);
+	ASSERT(pListItem != (RTOS_listItem_t*) &pList->endItem);
 
 	/* Make the next of previous item the next item */
 	pListItem->pPrev->pNext = pListItem->pNext;

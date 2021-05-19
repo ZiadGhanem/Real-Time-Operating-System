@@ -59,11 +59,12 @@ void RTOS_schedulerStart(void)
     memory, after the instruction has been completed. */
 	__ISB();
 
+	/* Reset SysTick Count */
+	RTOS_systickCount = 0;
+
 	/* Enable all interrupts */
 	__set_BASEPRI(0);
 
-	/* Reset SysTick Count */
-	RTOS_systickCount = 0;
 }
 
 /*
@@ -75,6 +76,9 @@ void RTOS_schedulerStart(void)
  */
 void RTOS_SysTick_Handler(void)
 {
+ 	/* Check for threads to be unblocked */
+ 	RTOS_threadUnblock();
+
 	/* Invoke a pendSV exception */
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 

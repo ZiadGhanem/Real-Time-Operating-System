@@ -83,6 +83,9 @@ void RTOS_SVC_Handler_Main(uint32_t* svc_args)
 							(void *)svc_args[2],
 							(uint32_t)svc_args[3]);
 			break;
+		case 2:
+			RTOS_threadDelay((uint32_t) svc_args[0]);
+			break;
 		/* Unsupported supervisor call */
 		default:
 			ASSERT(0)
