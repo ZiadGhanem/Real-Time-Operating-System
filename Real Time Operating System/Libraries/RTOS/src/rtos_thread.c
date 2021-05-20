@@ -142,6 +142,42 @@ RTOS_thread_t* RTOS_threadGetRunning(void)
 	return pCurrentlyRunningThread;
 }
 
+/*
+ * This function returns the currently a pointer to a certain ready list
+ * Inputs:
+ *  priority -> Required Priority
+ * Return:
+ * 	Pointer to the the list
+ */
+RTOS_list_t* RTOS_threadGetList(uint32_t priority)
+{
+	return &RTOS_readyList[priority];
+}
+
+/*
+ * This function sets the current top priority thread in the system
+ * Inputs:
+ *  priority -> The new top priority
+ * Return:
+ * 	Current top priority in the system
+ */
+void RTOS_threadSetTopPriority(uint32_t priority)
+{
+	currentTopPriority = priority;
+}
+
+/*
+ * This function returns the current top priority thread in the system
+ * Inputs:
+ *  None
+ * Return:
+ * 	Current top priority in the system
+ */
+uint32_t RTOS_threadGetTopPriority(void)
+{
+	return currentTopPriority;
+}
+
 
 /*
  * This function switches the currently running thread
@@ -182,7 +218,7 @@ void RTOS_threadSwitch(void)
 void RTOS_threadDelay(uint32_t systicks)
 {
 	/* Remove the current thread from ready list */
-	RTOS_listRemove(&RTOS_readyList[pCurrentlyRunningThread->priority], &pCurrentlyRunningThread->listItem);
+	RTOS_listRemove(&pCurrentlyRunningThread->listItem);
 
 	/* Set the delay amount */
 	pCurrentlyRunningThread->delay_systicks = systicks;
@@ -218,7 +254,7 @@ void RTOS_threadUnblock(void)
 			else
 			{
 				/* Remove the current thread from delay list */
-				RTOS_listRemove(&RTOS_delayList, pCurrentItem);
+				RTOS_listRemove(pCurrentItem);
 
 				/* Clear the delay amount */
 				pCurrentThread->delay_systicks = 0;

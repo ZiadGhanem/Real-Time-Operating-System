@@ -61,15 +61,14 @@ void RTOS_listAppend(RTOS_list_t* pList, RTOS_listItem_t* pListItem)
 /*
  * This function removes an item from a list
  * Inputs:
- * 	pList -> The RTOS list
  * 	pListItem -> The RTOS list item to be removed
  * Return:
  * 	None
  */
-void RTOS_listRemove(RTOS_list_t* pList, RTOS_listItem_t* pListItem)
+void RTOS_listRemove(RTOS_listItem_t* pListItem)
 {
-	ASSERT(pList != NULL);
 	ASSERT(pListItem != NULL);
+	RTOS_list_t* pList = pListItem->pList;
 	ASSERT(pListItem != (RTOS_listItem_t*) &pList->endItem);
 
 	/* Make the next of previous item the next item */

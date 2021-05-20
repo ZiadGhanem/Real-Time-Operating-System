@@ -11,8 +11,10 @@
 #include "stm32f4xx.h"
 #include "rtos_conf.h"
 #include "rtos_list.h"
+#include "rtos_fifo.h"
 #include "rtos_thread.h"
 #include "rtos_scheduler.h"
+#include "rtos_semaphore.h"
 
 #define MEM32WORD(ADDRESS) (*((volatile uint32_t *)(ADDRESS)))
 

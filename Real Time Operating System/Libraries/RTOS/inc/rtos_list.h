@@ -20,7 +20,7 @@ struct listItem_t{
 	struct listItem_t* pPrev;
 	void* pList;
 	void* pThread;
-}listItem_t;
+};
 
 typedef struct listItem_t RTOS_listItem_t;
 
@@ -47,7 +47,7 @@ typedef struct{
 
 void RTOS_listInit(RTOS_list_t* pList);
 void RTOS_listAppend(RTOS_list_t* pList, RTOS_listItem_t* pListItem);
-void RTOS_listRemove(RTOS_list_t* pList, RTOS_listItem_t* pListItem);
+void RTOS_listRemove(RTOS_listItem_t* pListItem);
 
 
 

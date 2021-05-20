@@ -1,0 +1,3 @@
+rtos_semaphore.c:18:6:RTOS_semaphoreInit	16	static
+rtos_semaphore.c:35:6:RTOS_semaphoreWait	48	static
+rtos_semaphore.c:80:6:RTOS_semaphoreSignal	56	static
