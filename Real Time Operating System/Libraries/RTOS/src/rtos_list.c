@@ -85,6 +85,8 @@ void RTOS_listRemove(RTOS_listItem_t* pListItem)
 	{
 
 	}
+	/* Make the list of the item NULL */
+	pListItem->pList = NULL;
 	/* Increment the number of items in the list */
 	pList->numListItems--;
 }

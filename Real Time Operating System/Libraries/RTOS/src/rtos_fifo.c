@@ -82,25 +82,26 @@ RTOS_listItem_t* RTOS_FIFORemove(RTOS_FIFO_t* pFIFO)
 	}
 
 	RTOS_listItem_t* pListItem = pFIFO->pGet;
-
 	/* Make the next of previous item the next item */
 	pListItem->pPrev->pNext = pListItem->pNext;
 	/* Make the previous of the next item the previous item */
 	pListItem->pNext->pPrev = pListItem->pPrev;
-
+	/* Increment the get pointer */
 	pFIFO->pGet = pFIFO->pGet->pNext;
-
-	/* Handle the case where the FIFO would become empty */
-	if(pFIFO->pPut == pFIFO->pGet)
+	/* Set the FIFO of the item as NULL */
+	pListItem->pList = NULL;
+	/* Decrement the number of items in the FIFO */
+	pFIFO->numFIFOItems--;
+	/* Handle the case where the FIFO became empty */
+	if(pFIFO->numFIFOItems == 0)
 	{
-		pFIFO->pPut = pFIFO->pPut->pNext;
+		pFIFO->pPut = (RTOS_listItem_t*) &(pFIFO->endItem);
+		pFIFO->pGet = pFIFO->pPut;
 	}
 	else
 	{
 
 	}
-
-	pFIFO->numFIFOItems--;
 
 	return pListItem;
 

@@ -12,6 +12,9 @@
  .global RTOS_SVC_schedulerStart
  .global RTOS_SVC_threadCreate
  .global RTOS_SVC_threadDelay
+ .global RTOS_SVC_semaphoreInit
+ .global RTOS_SVC_semaphoreWait
+ .global RTOS_SVC_semaphoreSignal
 
 
  .text
@@ -30,3 +33,19 @@
  RTOS_SVC_threadDelay:
  	SVC 2
  	BX LR
+
+ .type RTOS_SVC_semaphoreInit, %function
+ RTOS_SVC_semaphoreInit:
+ 	SVC 3
+ 	BX LR
+
+ .type RTOS_SVC_semaphoreWait, %function
+ RTOS_SVC_semaphoreWait:
+ 	SVC 4
+ 	BX LR
+
+ .type RTOS_SVC_semaphoreSignal, %function
+ RTOS_SVC_semaphoreSignal:
+ 	SVC 5
+ 	BX LR
+

@@ -86,6 +86,15 @@ void RTOS_SVC_Handler_Main(uint32_t* svc_args)
 		case 2:
 			RTOS_threadDelay((uint32_t) svc_args[0]);
 			break;
+		case 3:
+			RTOS_semaphoreInit((RTOS_semaphore_t*) svc_args[0], (int32_t)svc_args[1]);
+			break;
+		case 4:
+			RTOS_semaphoreWait((RTOS_semaphore_t*) svc_args[0]);
+			break;
+		case 5:
+			RTOS_semaphoreSignal((RTOS_semaphore_t*) svc_args[0]);
+			break;
 		/* Unsupported supervisor call */
 		default:
 			ASSERT(0)
