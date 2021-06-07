@@ -46,7 +46,8 @@ typedef struct{
 
 
 void RTOS_listInit(RTOS_list_t* pList);
-void RTOS_listAppend(RTOS_list_t* pList, RTOS_listItem_t* pListItem);
+void RTOS_listInsertEnd(RTOS_list_t* pList, RTOS_listItem_t* pListItem);
+void RTOS_listInsert(RTOS_list_t* pList, RTOS_listItem_t* pListItem);
 void RTOS_listRemove(RTOS_listItem_t* pListItem);
 
 

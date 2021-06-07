@@ -26,5 +26,4 @@ void RTOS_FIFOInit(RTOS_FIFO_t* pFIFO);
 void RTOS_FIFOAppend(RTOS_FIFO_t* pFIFO, RTOS_listItem_t* pListItem);
 RTOS_listItem_t* RTOS_FIFORemove(RTOS_FIFO_t* pFIFO);
 
-
 #endif /* RTOS_INC_RTOS_FIFO_H_ */

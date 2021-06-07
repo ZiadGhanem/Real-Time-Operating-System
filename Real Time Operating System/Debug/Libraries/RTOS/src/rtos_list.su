@@ -1,3 +1,4 @@
 rtos_list.c:17:6:RTOS_listInit	16	static
-rtos_list.c:40:6:RTOS_listAppend	16	static
-rtos_list.c:68:6:RTOS_listRemove	24	static
+rtos_list.c:40:6:RTOS_listInsertEnd	16	static
+rtos_list.c:69:6:RTOS_listInsert	24	static
+rtos_list.c:110:6:RTOS_listRemove	24	static

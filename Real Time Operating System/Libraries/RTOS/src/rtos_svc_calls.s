@@ -48,4 +48,3 @@
  RTOS_SVC_semaphoreSignal:
  	SVC 5
  	BX LR
-

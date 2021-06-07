@@ -10,7 +10,7 @@
 /* Current top thread priority */
 static uint32_t currentTopPriority = MAX_PRIORITY_LEVEL - 1;
 /* Pointer to the current running thread */
-static RTOS_thread_t* pCurrentlyRunningThread = NULL;
+static RTOS_thread_t* pRunningThread = NULL;
 /* RTOS ready lists */
 static RTOS_list_t RTOS_readyList[MAX_PRIORITY_LEVEL];
 /* RTOS delayed list */
@@ -104,7 +104,7 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, void* pFunc
 	pThread->listItem.pThread = pThread;
 
 	/* Add the thread to the ready list */
-	RTOS_listAppend(&RTOS_readyList[priority], &pThread->listItem);
+	RTOS_listInsertEnd(&RTOS_readyList[priority], &pThread->listItem);
 
 	/* Check if the new thread has a new highest priority */
 	if(priority < currentTopPriority)
@@ -117,7 +117,7 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, void* pFunc
 	}
 
 	/* Check if the scheduler has started and the currently running thread has a lower priority */
-	if((pCurrentlyRunningThread != NULL) && (priority < pCurrentlyRunningThread->priority))
+	if((pRunningThread != NULL) && (priority < pRunningThread->priority))
 	{
 		/* Invoke a pendSV exception */
 	    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
@@ -131,7 +131,7 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, void* pFunc
 
 
 /*
- * This function get the currently running thread
+ * This function returns the running thread
  * Inputs:
  *  None
  * Return:
@@ -139,43 +139,40 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, void* pFunc
  */
 RTOS_thread_t* RTOS_threadGetRunning(void)
 {
-	return pCurrentlyRunningThread;
+	return pRunningThread;
 }
 
 /*
- * This function returns the currently a pointer to a certain ready list
+ * This function adds the thread to its ready list
  * Inputs:
- *  priority -> Required Priority
+ *  pThread -> The thread to be inserted in the ready list
  * Return:
  * 	Pointer to the the list
  */
-RTOS_list_t* RTOS_threadGetList(uint32_t priority)
+void RTOS_threadAddToReadyList(RTOS_thread_t* pThread)
 {
-	return &RTOS_readyList[priority];
-}
+	RTOS_listItem_t* pListItem = &pThread->listItem;
+	RTOS_listInsertEnd(&RTOS_readyList[pThread->priority], pListItem);
+	/* Check if the thread has a new highest priority */
+	if(pThread->priority < currentTopPriority)
+	{
+		/* Set the new top priority */
+		currentTopPriority = pThread->priority;
+	}
+	else
+	{
 
-/*
- * This function sets the current top priority thread in the system
- * Inputs:
- *  priority -> The new top priority
- * Return:
- * 	Current top priority in the system
- */
-void RTOS_threadSetTopPriority(uint32_t priority)
-{
-	currentTopPriority = priority;
-}
+	}
 
-/*
- * This function returns the current top priority thread in the system
- * Inputs:
- *  None
- * Return:
- * 	Current top priority in the system
- */
-uint32_t RTOS_threadGetTopPriority(void)
-{
-	return currentTopPriority;
+	if(pRunningThread != NULL &&
+	(pThread->priority < pRunningThread->priority))
+	{
+		/* Invoke a pendSV exception */
+		SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+	}
+	else
+	{
+	}
 }
 
 
@@ -204,7 +201,7 @@ void RTOS_threadSwitch(void)
 		RTOS_readyList[currentTopPriority].pIndex = RTOS_readyList[currentTopPriority].pIndex->pNext;
 	}
 
-	pCurrentlyRunningThread = RTOS_readyList[currentTopPriority].pIndex->pThread;
+	pRunningThread = RTOS_readyList[currentTopPriority].pIndex->pThread;
 
 }
 
@@ -218,13 +215,13 @@ void RTOS_threadSwitch(void)
 void RTOS_threadDelay(uint32_t systicks)
 {
 	/* Remove the current thread from ready list */
-	RTOS_listRemove(&pCurrentlyRunningThread->listItem);
+	RTOS_listRemove(&pRunningThread->listItem);
 
 	/* Set the delay amount */
-	pCurrentlyRunningThread->delay_systicks = systicks;
+	pRunningThread->delay_systicks = systicks;
 
 	/* Add the thread to the delayed list */
-	RTOS_listAppend(&RTOS_delayList, &pCurrentlyRunningThread->listItem);
+	RTOS_listInsertEnd(&RTOS_delayList, &pRunningThread->listItem);
 
 	/* Invoke a pendSV exception */
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
@@ -259,18 +256,8 @@ void RTOS_threadUnblock(void)
 				/* Clear the delay amount */
 				pCurrentThread->delay_systicks = 0;
 
-				/* Check if the thread has a new highest priority */
-				if(pCurrentThread->priority < currentTopPriority)
-				{
-					currentTopPriority = pCurrentThread->priority;
-				}
-				else
-				{
-
-				}
-
 				/* Add the thread to the ready list */
-				RTOS_listAppend(&RTOS_readyList[pCurrentThread->priority], pCurrentItem);
+				RTOS_threadAddToReadyList(pCurrentThread);
 			}
 		}
 		pCurrentItem = pCurrentItem->pNext;

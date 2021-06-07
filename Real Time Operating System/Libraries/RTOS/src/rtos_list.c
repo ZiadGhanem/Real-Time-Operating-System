@@ -30,14 +30,14 @@ void RTOS_listInit(RTOS_list_t* pList)
 }
 
 /*
- * This function adds an item after the current index
+ * This function adds an item at the end of the list
  * Inputs:
  * 	pList -> The RTOS list
  * 	pListItem -> The RTOS list item to be inserted
  * Return:
  * 	None
  */
-void RTOS_listAppend(RTOS_list_t* pList, RTOS_listItem_t* pListItem)
+void RTOS_listInsertEnd(RTOS_list_t* pList, RTOS_listItem_t* pListItem)
 {
 	ASSERT(pList != NULL);
 	ASSERT(pListItem != NULL);
@@ -52,6 +52,48 @@ void RTOS_listAppend(RTOS_list_t* pList, RTOS_listItem_t* pListItem)
 	pList->pIndex->pNext = pListItem;
 	/* Update the current index to the new item */
 	pList->pIndex = pListItem;
+	/* Set the list of the new item as the list */
+	pListItem->pList = pList;
+	/* Increment the number of items in the list */
+	pList->numListItems++;
+}
+
+/*
+ * This function orders the list using priority
+ * Inputs:
+ * 	pList -> The RTOS list
+ * 	pListItem -> The RTOS list item to be inserted
+ * Return:
+ * 	None
+ */
+void RTOS_listInsert(RTOS_list_t* pList, RTOS_listItem_t* pListItem)
+{
+	ASSERT(pList != NULL);
+	ASSERT(pListItem != NULL);
+
+	/* Start with the first item in the list */
+	RTOS_listItem_t* pCurrentItem = (RTOS_listItem_t*) &pList->endItem;
+
+	/* Find the location of the highest priority in the list,
+	 * Lazy evaluation prevents the second condition from being
+	 * tested in case the next item was the end item as it doesn't
+	 * have pThread
+	 */
+	 /* Not less than or equal so the thread waiting the most gets executed first */
+	while((pCurrentItem->pNext != (RTOS_listItem_t*) &pList->endItem) &&
+	(((RTOS_thread_t*)pListItem->pThread)->priority < ((RTOS_thread_t*)pCurrentItem->pNext->pThread)->priority))
+	{
+		pCurrentItem = pCurrentItem->pNext;
+	}
+
+	/* Make the next of the new item the next of the current index item of list */
+	pListItem->pNext = pCurrentItem->pNext;
+	/* Make the previous of the new item the current index item of the list */
+	pListItem->pPrev = pCurrentItem;
+	/* Make the previous of the item that was the next the new item */
+	pListItem->pNext->pPrev = pListItem;
+	/* Make the next item of the current index item the new list item */
+	pCurrentItem->pNext = pListItem;
 	/* Set the list of the new item as the list */
 	pListItem->pList = pList;
 	/* Increment the number of items in the list */
@@ -90,4 +132,3 @@ void RTOS_listRemove(RTOS_listItem_t* pListItem)
 	/* Increment the number of items in the list */
 	pList->numListItems--;
 }
-

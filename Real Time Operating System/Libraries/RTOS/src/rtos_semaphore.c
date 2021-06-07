@@ -17,8 +17,9 @@
  */
 void RTOS_semaphoreInit(RTOS_semaphore_t* pSemaphore, int32_t value)
 {
-	/* Initialize the semaphores' FIFO */
-	RTOS_FIFOInit(&pSemaphore->semaphoreFIFO);
+	ASSERT(value >= 0);
+	/* Initialize the semaphores list */
+	RTOS_listInit(&pSemaphore->semaphoreList);
 	/* Set the semaphores' value */
 	pSemaphore->value = value;
 }
@@ -34,44 +35,40 @@ void RTOS_semaphoreInit(RTOS_semaphore_t* pSemaphore, int32_t value)
 
 void RTOS_semaphoreWait(RTOS_semaphore_t* pSemaphore)
 {
-	/* Load the semaphore value */
-	int32_t value = (int32_t)__LDREXW((uint32_t*) &pSemaphore->value);
-	/* Decrement the semaphore value */
-	value --;
-	// Acquire the semaphore
-	if( __STREXW(value,(uint32_t*) &pSemaphore->value) == 0)
+	/* Keep trying to acquire the semaphore */
+	int32_t value;
+	do
 	{
-		/* Check if the semaphore value is bigger than or equal zero */
-		if(value >= 0)
-		{
-			return;
-		}
-		else
-		{
+		/* Load the semaphore value */
+		value = (int32_t)__LDREXW((uint32_t*) &pSemaphore->value);
+		/* Decrement the semaphore value */
+		value--;
+	}
+	while( __STREXW(value,(uint32_t*) &pSemaphore->value) == 1);
 
-		}
+	if(value < 0)
+	{
+		/* Block this process */
+		RTOS_listItem_t* runningItem = &(RTOS_threadGetRunning()->listItem);
 
+		/* Remove the thread from the ready list */
+		RTOS_listRemove(runningItem);
+
+		/* Add the thread to the semaphores' list */
+		RTOS_listInsert(&pSemaphore->semaphoreList, runningItem);
+
+		/* Invoke a pendSV exception */
+		SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 	}
 	else
 	{
 
 	}
-
-	RTOS_listItem_t* runningItem = &(RTOS_threadGetRunning()->listItem);
-
-	/* Remove the thread from the ready list */
-	RTOS_listRemove(runningItem);
-
-	/* Add the thread to the semaphores' FIFO */
-	RTOS_FIFOAppend(&pSemaphore->semaphoreFIFO, runningItem);
-
-	/* Invoke a pendSV exception */
-	SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
 
 
 /*
- * This function initializes the semaphore
+ * This function signals the semaphore
  * Inputs:
  *  pSemaphore -> Pointer to the semaphore
  * Return:
@@ -79,39 +76,27 @@ void RTOS_semaphoreWait(RTOS_semaphore_t* pSemaphore)
  */
 void RTOS_semaphoreSignal(RTOS_semaphore_t* pSemaphore)
 {
-	/* Load the semaphore value */
-	int32_t value = (int32_t)__LDREXW((uint32_t*) &pSemaphore->value);
-	/* Increment the semaphore value */
-	value ++;
-	// Acquire the semaphore
-	if( __STREXW(value,(uint32_t*) &pSemaphore->value) == 0)
+	/* Keep trying to acquire the semaphore */
+	int32_t value;
+	do
 	{
-		/* Check if the semaphore value is less than or equal zero */
-		if(value <= 0)
-		{
-			/* Remove a process from the FIFO */
-			RTOS_listItem_t* pRemovedItem = RTOS_FIFORemove(&pSemaphore->semaphoreFIFO);
-			RTOS_thread_t* pRemovedThread = pRemovedItem->pThread;
+		/* Load the semaphore value */
+		value = (int32_t)__LDREXW((uint32_t*) &pSemaphore->value);
+		/* Increment the semaphore value */
+		value++;
+	}
+	while( __STREXW(value,(uint32_t*) &pSemaphore->value) == 1);
 
-			/* Place this thread in the ready list */
-			RTOS_listAppend(RTOS_threadGetList(pRemovedThread->priority), pRemovedItem);
+	if(value <= 0)
+	{
+		/* Remove a process from the list */
+		RTOS_listItem_t* pRemovedItem = pSemaphore->semaphoreList.endItem.pPrev;
+		RTOS_listRemove(pRemovedItem);
+		/* Place this thread in the ready list */
+		RTOS_threadAddToReadyList(pRemovedItem->pThread);
+	}
+	else
+	{
 
-			/* Check if the thread has a new highest priority */
-			if(pRemovedThread->priority < RTOS_threadGetTopPriority())
-			{
-				/* Set the new top priority */
-				RTOS_threadSetTopPriority(pRemovedThread->priority);
-				/* Invoke a pendSV exception */
-				SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
-			}
-			else
-			{
-
-			}
-		}
-		else
-		{
-
-		}
 	}
 }

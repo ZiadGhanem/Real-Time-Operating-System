@@ -41,7 +41,7 @@ void func_1(void)
 	while(1)
 	{
 		GPIO_ToggleBits(GPIOG, (1 << 13));
-		RTOS_SVC_threadDelay(500);
+		RTOS_SVC_threadDelay(700);
 		RTOS_SVC_semaphoreSignal(&semaphore);
 	}
 }
@@ -51,6 +51,8 @@ void func_2(void)
 	while(1)
 	{
 		GPIO_ToggleBits(GPIOG, (1 << 14));
+		RTOS_SVC_semaphoreWait(&semaphore);
+		RTOS_SVC_semaphoreWait(&semaphore);
 		RTOS_SVC_semaphoreWait(&semaphore);
 	}
 }
