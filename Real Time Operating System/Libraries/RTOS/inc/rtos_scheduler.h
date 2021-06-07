@@ -12,6 +12,7 @@
 extern void RTOS_SVC_schedulerStart(void);
 void RTOS_schedulerStart(void);
 void RTOS_SysTick_Handler(void);
+uint32_t RTOS_schedulerGetSystickCount(void);
 
 
 #endif /* RTOS_INC_RTOS_SCHEDULER_H_ */

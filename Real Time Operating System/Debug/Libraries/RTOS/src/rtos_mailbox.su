@@ -1,0 +1,3 @@
+rtos_mailbox.c:11:6:RTOS_mailBoxInit	24	static
+rtos_mailbox.c:29:6:RTOS_mailBoxSend	16	static
+rtos_mailbox.c:45:6:RTOS_mailBoxReceive	16	static

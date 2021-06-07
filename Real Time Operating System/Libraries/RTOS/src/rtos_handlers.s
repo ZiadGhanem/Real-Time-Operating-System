@@ -52,11 +52,19 @@
 	BL RTOS_threadGetRunning
 	STR R1, [R0]
 
-	/****************** Restoring the next thread's context ********************/
+	/****************** Switch threads ********************/
+	/* Disable all interrupts excepts SVC as PendSV can be interrupted */
+	MOV R1, #1
+	MSR BASEPRI, R1
  	/* Get the next thread */
  	BL RTOS_threadSwitch
  	/* Set the process stack pointer to the thread's stack */
  	BL RTOS_threadGetRunning
+	/* Enable all interrupts */
+	MOV R1, #0
+	MSR BASEPRI, R1
+
+	/****************** Restoring the next thread's context ********************/
  	LDR R1, [R0]
  	/* POP {R2 -> R11} from the thread's stack*/
  	LDMIA R1!, {R2-R11}

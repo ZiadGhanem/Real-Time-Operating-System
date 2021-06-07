@@ -46,16 +46,22 @@ void RTOS_semaphoreWait(RTOS_semaphore_t* pSemaphore)
 	}
 	while( __STREXW(value,(uint32_t*) &pSemaphore->value) == 1);
 
+	/* Data Memory Barrier */
+	__DMB();
+
 	if(value < 0)
 	{
 		/* Block this process */
-		RTOS_listItem_t* runningItem = &(RTOS_threadGetRunning()->listItem);
+		RTOS_listItem_t* pRunningItem = &(RTOS_threadGetRunning()->listItem);
+
+		/* Set the items' ordering value */
+		pRunningItem->orderValue = ((RTOS_thread_t*)pRunningItem->pThread)->priority;
 
 		/* Remove the thread from the ready list */
-		RTOS_listRemove(runningItem);
+		RTOS_listRemove(pRunningItem);
 
 		/* Add the thread to the semaphores' list */
-		RTOS_listInsert(&pSemaphore->semaphoreList, runningItem);
+		RTOS_listInsert(&pSemaphore->semaphoreList, pRunningItem);
 
 		/* Invoke a pendSV exception */
 		SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
@@ -86,6 +92,9 @@ void RTOS_semaphoreSignal(RTOS_semaphore_t* pSemaphore)
 		value++;
 	}
 	while( __STREXW(value,(uint32_t*) &pSemaphore->value) == 1);
+
+	/* Data Memory Barrier */
+	__DMB();
 
 	if(value <= 0)
 	{

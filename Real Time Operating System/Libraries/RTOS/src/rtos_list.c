@@ -81,7 +81,7 @@ void RTOS_listInsert(RTOS_list_t* pList, RTOS_listItem_t* pListItem)
 	 */
 	 /* Not less than or equal so the thread waiting the most gets executed first */
 	while((pCurrentItem->pNext != (RTOS_listItem_t*) &pList->endItem) &&
-	(((RTOS_thread_t*)pListItem->pThread)->priority < ((RTOS_thread_t*)pCurrentItem->pNext->pThread)->priority))
+	(pListItem->orderValue < pCurrentItem->pNext->orderValue))
 	{
 		pCurrentItem = pCurrentItem->pNext;
 	}

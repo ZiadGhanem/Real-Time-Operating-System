@@ -1,0 +1,3 @@
+rtos_spinlock.c:18:6:RTOS_spinInit	16	static
+rtos_spinlock.c:34:6:RTOS_spinLock	40	static
+rtos_spinlock.c:69:6:RTOS_spinUnlock	16	static

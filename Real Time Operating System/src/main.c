@@ -34,26 +34,29 @@ SOFTWARE.
 
 RTOS_thread_t thread[2];
 RTOS_stack_t stack[2];
-RTOS_semaphore_t semaphore;
+RTOS_mailBox_t mailbox;
+uint8_t buffer[10];
 
 void func_1(void)
 {
+	uint8 val = 0;
 	while(1)
 	{
-		GPIO_ToggleBits(GPIOG, (1 << 13));
-		RTOS_SVC_threadDelay(700);
-		RTOS_SVC_semaphoreSignal(&semaphore);
+		RTOS_SVC_threadDelay(500);
+		RTOS_SVC_mailBoxSend(&mailbox, &val);
+		val = (val + 1) % 4;
 	}
 }
 
 void func_2(void)
 {
+	uint8_t val;
 	while(1)
 	{
-		GPIO_ToggleBits(GPIOG, (1 << 14));
-		RTOS_SVC_semaphoreWait(&semaphore);
-		RTOS_SVC_semaphoreWait(&semaphore);
-		RTOS_SVC_semaphoreWait(&semaphore);
+		RTOS_SVC_mailBoxReceive(&mailbox, &val);
+		GPIO_WriteBit(GPIOG, (1 << 13), (val & 1));
+		GPIO_WriteBits(GPIOG, (1 << 14), (val >> 1) & 1);
+
 	}
 }
 
@@ -74,7 +77,7 @@ int main(void)
 	RTOS_SVC_threadCreate(&thread[0], &stack[0], func_1, 1);
 	RTOS_SVC_threadCreate(&thread[1], &stack[1], func_2, 1);
 
-	RTOS_SVC_semaphoreInit(&semaphore, 0);
+	RTOS_SVC_mailBoxInit(&mailbox, buffer, 10, 1);
 
 	RTOS_SVC_schedulerStart();
 

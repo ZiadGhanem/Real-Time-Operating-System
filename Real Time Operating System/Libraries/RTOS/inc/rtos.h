@@ -14,7 +14,9 @@
 #include "rtos_thread.h"
 #include "rtos_scheduler.h"
 #include "rtos_semaphore.h"
-#include "rtos_fifo.h"
+#include "rtos_mutex.h"
+#include "rtos_spinlock.h"
+#include "rtos_mailbox.h"
 
 #define MEM32WORD(ADDRESS) (*((volatile uint32_t *)(ADDRESS)))
 
@@ -24,6 +26,9 @@
 		__disable_irq();	\
 		while(1);	\
 	}
+
+#define FAILURE 0
+#define SUCCESS 1
 
 void RTOS_init(void);
 void RTOS_SVC_Handler_Main(uint32_t* svc_args);

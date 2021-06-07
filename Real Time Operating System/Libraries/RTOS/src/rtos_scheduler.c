@@ -76,12 +76,24 @@ void RTOS_schedulerStart(void)
  */
 void RTOS_SysTick_Handler(void)
 {
- 	/* Check for threads to be unblocked */
- 	RTOS_threadUnblock();
+ 	/* Check for delayed threads to be unblocked */
+ 	RTOS_threadDelayCheck();
 
 	/* Invoke a pendSV exception */
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 
     /* Increment SysTick Count */
     RTOS_systickCount++;
+}
+
+/*
+ * This function returns the systick count so far
+ * Inputs:
+ * 	None
+ * Return:
+ * 	None
+ */
+uint32_t RTOS_schedulerGetSystickCount(void)
+{
+	return RTOS_systickCount;
 }

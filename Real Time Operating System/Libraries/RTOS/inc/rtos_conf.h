@@ -11,6 +11,7 @@
 #include "stm32f4xx.h"
 #include <stdint.h>
 #include <stddef.h>
+#include <string.h>
 
 /* Scheduler frequency */
 #define SYSTICK_FREQUENCY	1000UL

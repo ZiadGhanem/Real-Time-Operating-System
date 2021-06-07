@@ -12,9 +12,19 @@
  .global RTOS_SVC_schedulerStart
  .global RTOS_SVC_threadCreate
  .global RTOS_SVC_threadDelay
+ .global RTOS_SVC_threadTerminate
  .global RTOS_SVC_semaphoreInit
  .global RTOS_SVC_semaphoreWait
  .global RTOS_SVC_semaphoreSignal
+ .global RTOS_SVC_mutexInit
+ .global RTOS_SVC_mutexLock
+ .global RTOS_SVC_mutexUnlock
+ .global RTOS_SVC_spinInit
+ .global RTOS_SVC_spinLock
+ .global RTOS_SVC_spinUnlock
+ .global RTOS_SVC_mailBoxInit
+ .global RTOS_SVC_mailBoxSend
+ .global RTOS_SVC_mailBoxReceive
 
 
  .text
@@ -34,17 +44,67 @@
  	SVC 2
  	BX LR
 
+ .type RTOS_SVC_threadTerminate, %function
+ RTOS_SVC_threadTerminate:
+ 	SVC 3
+ 	BX LR
+
  .type RTOS_SVC_semaphoreInit, %function
  RTOS_SVC_semaphoreInit:
- 	SVC 3
+ 	SVC 4
  	BX LR
 
  .type RTOS_SVC_semaphoreWait, %function
  RTOS_SVC_semaphoreWait:
- 	SVC 4
+ 	SVC 5
  	BX LR
 
  .type RTOS_SVC_semaphoreSignal, %function
  RTOS_SVC_semaphoreSignal:
- 	SVC 5
+ 	SVC 6
+ 	BX LR
+
+ .type RTOS_SVC_mutexInit, %function
+ RTOS_SVC_mutexInit:
+ 	SVC 7
+ 	BX LR
+
+ .type RTOS_SVC_mutexLock, %function
+ RTOS_SVC_mutexLock:
+ 	SVC 8
+ 	BX LR
+
+ .type RTOS_SVC_mutexUnlock, %function
+ RTOS_SVC_mutexUnlock:
+ 	SVC 9
+ 	BX LR
+
+ .type RTOS_SVC_spinInit, %function
+ RTOS_SVC_spinInit:
+ 	SVC 10
+ 	BX LR
+
+ .type RTOS_SVC_spinLock, %function
+ RTOS_SVC_spinLock:
+ 	SVC 11
+ 	BX LR
+
+ .type RTOS_SVC_spinUnlock, %function
+ RTOS_SVC_spinUnlock:
+ 	SVC 12
+ 	BX LR
+
+ .type RTOS_SVC_mailBoxInit, %function
+ RTOS_SVC_mailBoxInit:
+ 	SVC 13
+ 	BX LR
+
+ .type RTOS_SVC_mailBoxSend, %function
+ RTOS_SVC_mailBoxSend:
+ 	SVC 14
+ 	BX LR
+
+ .type RTOS_SVC_mailBoxReceive, %function
+ RTOS_SVC_mailBoxReceive:
+ 	SVC 15
  	BX LR

@@ -1,3 +1,4 @@
 rtos_scheduler.c:23:13:RTOS_idleThreadFunc	4	static
 rtos_scheduler.c:35:6:RTOS_schedulerStart	24	static
 rtos_scheduler.c:77:6:RTOS_SysTick_Handler	8	static
+rtos_scheduler.c:96:10:RTOS_schedulerGetSystickCount	4	static

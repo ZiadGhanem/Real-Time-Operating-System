@@ -14,12 +14,14 @@
  * pPrev -> Pointer to the previous item in the list
  * pList -> Pointer to the container of this list item
  * pThread -> Pointer to the thread of this item
+ * orderValue -> The value used for ordering in the list
  */
 struct listItem_t{
 	struct listItem_t* pNext;
 	struct listItem_t* pPrev;
 	void* pList;
 	void* pThread;
+	uint32_t orderValue;
 };
 
 typedef struct listItem_t RTOS_listItem_t;
