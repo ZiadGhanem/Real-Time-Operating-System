@@ -48,10 +48,11 @@ void RTOS_threadListsInit(void)
  * Return:
  * 	None
  */
-void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, void* pFunction, uint32_t priority)
+void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, uint32_t stackSize, void* pFunction, uint32_t priority)
 {
 	ASSERT(pThread != NULL);
 	ASSERT(pStack != NULL);
+	ASSERT(stackSize <= MAX_STACK_SIZE);
 	ASSERT(pFunction != NULL);
 	ASSERT((priority < MAX_PRIORITY_LEVEL) && (priority >= 0));
 
@@ -78,8 +79,26 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, void* pFunc
 	 * xPSR
 	 */
 
+	/* To ensure that the stack is 8 byte aligned */
+	stackSize = (stackSize / 8) * 8;
+
 	/* Initialize the stack pointer */
-	pThread->pStack = (uint32_t)pStack->stack + MAX_STACK_SIZE * 8 - 18 * 4;
+	pThread->pStack = (uint32_t)pStack + stackSize * 8 - 18 * 4;
+
+	/* For testing */
+	MEM32WORD(pThread->pStack + (2 << 2)) = 0x4;
+	MEM32WORD(pThread->pStack + (3 << 2)) = 0x5;
+	MEM32WORD(pThread->pStack + (4 << 2)) = 0x6;
+	MEM32WORD(pThread->pStack + (5 << 2)) = 0x7;
+	MEM32WORD(pThread->pStack + (6 << 2)) = 0x8;
+	MEM32WORD(pThread->pStack + (7 << 2)) = 0x9;
+	MEM32WORD(pThread->pStack + (8 << 2)) = 0x10;
+	MEM32WORD(pThread->pStack + (9 << 2)) = 0x11;
+	MEM32WORD(pThread->pStack + (10 << 2)) = 0x1;
+	MEM32WORD(pThread->pStack + (11 << 2)) = 0x2;
+	MEM32WORD(pThread->pStack + (12 << 2)) = 0x3;
+	MEM32WORD(pThread->pStack + (13 << 2)) = 0x4;
+	MEM32WORD(pThread->pStack + (14 << 2)) = 0x12;
 
 	/* Initialize EXC_RETURN (Return to thread mode using PSP) */
 	MEM32WORD(pThread->pStack) = 0xFFFFFFFDUL;
@@ -297,6 +316,8 @@ void RTOS_threadDelayCheck(void)
 	}
 }
 
+
+
 /*
  * This function terminates a thread
  * Inputs:
@@ -306,26 +327,44 @@ void RTOS_threadDelayCheck(void)
  */
 void RTOS_threadTerminate(RTOS_thread_t* pThread)
 {
-	/* Delete the currently running thread */
+
 	if(pThread == NULL)
 	{
-		/* Remove the current thread from ready list */
-		RTOS_listItem_t* pListItem = & pRunningThread->listItem;
-		RTOS_listRemove(pListItem);
-
-		/* Set the thread state to terminated */
-		pRunningThread->threadState = RTOS_THREADTERMINATED;
-
-		/* Invoke a pendSV exception */
-		SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+		pThread = pRunningThread;
 	}
 	else
 	{
-		/* Remove the thread from ready list */
-		RTOS_listItem_t* pListItem = & pThread->listItem;
-		RTOS_listRemove(pListItem);
 
-		/* Set the thread state to terminated */
-		pThread->threadState = RTOS_THREADTERMINATED;
 	}
+
+	/* Remove the threads items from any lists */
+	if(pThread->listItem.pList != NULL)
+	{
+		RTOS_listRemove(& pThread->listItem);
+	}
+	else
+	{
+
+	}
+
+
+	if(pThread->eventListItem.pList != NULL)
+	{
+		RTOS_listRemove(& pThread->eventListItem);
+	}
+	else
+	{
+
+	}
+
+	/* Set the thread as terminated */
+	pThread->threadState = RTOS_THREADTERMINATED;
+
+	/* If the thread is the current running thread */
+	if(pThread == pRunningThread)
+	{
+		/* Invoke a pendSV exception */
+	    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+	}
+
 }

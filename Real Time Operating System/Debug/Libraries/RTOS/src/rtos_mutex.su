@@ -1,3 +1,3 @@
 rtos_mutex.c:19:6:RTOS_mutexInit	16	static
 rtos_mutex.c:39:19:RTOS_mutexLock	48	static
-rtos_mutex.c:126:6:RTOS_mutexUnlock	24	static
+rtos_mutex.c:117:6:RTOS_mutexUnlock	24	static

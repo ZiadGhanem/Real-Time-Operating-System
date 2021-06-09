@@ -88,8 +88,9 @@ void RTOS_SVC_Handler_Main(uint32_t* svc_args)
 			/* Create a thread */
 			RTOS_threadCreate((RTOS_thread_t*)svc_args[0],
 							(RTOS_stack_t*)svc_args[1],
-							(void *)svc_args[2],
-							(uint32_t)svc_args[3]);
+							(uint32_t) svc_args[2],
+							(void *)svc_args[3],
+							(uint32_t) svc_args[8]);
 			break;
 		case 2:
 			/* Delay a thread by blocking it for a specific time delay */
@@ -192,7 +193,6 @@ void RTOS_SVC_Handler_Main(uint32_t* svc_args)
 			{
 				svc_args[0] = returnStatus;
 			}
-			break;
 			break;
 	}
 }

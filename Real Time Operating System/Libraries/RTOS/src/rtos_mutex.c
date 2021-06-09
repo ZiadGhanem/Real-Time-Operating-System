@@ -74,38 +74,29 @@ RTOS_returnStatus RTOS_mutexLock(RTOS_mutex_t* pMutex, uint32_t waitTicks)
 
 
 	/* If the mutex was not acquired successfully */
-	if(returnStatus != RTOS_SUCCESS)
+	if(returnStatus == RTOS_FAIL && waitTicks > 0)
 	{
-		if(waitTicks > 0)
+		/* Get the currently running thread */
+		RTOS_thread_t* pThread = RTOS_threadGetRunning();
+		/* Remove the thread from the ready list */
+		RTOS_listRemove(& pThread->listItem);
+		/* Set the items ordering value for the mutex list */
+		pThread->eventListItem.orderValue = pThread->priority;
+		/* Add the thread to the mutex list */
+		RTOS_listInsert(&pMutex->mutexList, & pThread->eventListItem);
+
+		if(waitTicks != RTOS_WAITFOREVER)
 		{
-			/* Get the currently running thread */
-			RTOS_thread_t* pThread = RTOS_threadGetRunning();
-			/* Remove the thread from the ready list */
-			RTOS_listRemove(& pThread->listItem);
-			/* Set the items ordering value for the mutex list */
-			pThread->eventListItem.orderValue = pThread->priority;
-			/* Add the thread to the mutex list */
-			RTOS_listInsert(&pMutex->mutexList, & pThread->eventListItem);
-
-			if(waitTicks == RTOS_WAITFOREVER)
-			{
-				/* The user wants to wait forever so we set the return status as success */
-				returnStatus = RTOS_SUCCESS;
-			}
 			/* Add the thread to timer's list */
-			else
-			{
-				RTOS_threadAddToTimerList(pThread, waitTicks);
-				returnStatus = RTOS_DELAY;
-			}
-			/* Invoke a pendSV exception */
-			SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+			RTOS_threadAddToTimerList(pThread, waitTicks);
 		}
-
 		else
 		{
 
 		}
+		returnStatus = RTOS_DELAY;
+		/* Invoke a pendSV exception */
+		SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 	}
 	else
 	{

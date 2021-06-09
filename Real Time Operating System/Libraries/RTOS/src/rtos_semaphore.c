@@ -72,38 +72,30 @@ RTOS_returnStatus RTOS_semaphoreWait(RTOS_semaphore_t* pSemaphore, uint32_t wait
 
 
 	/* If the semaphore was not acquired successfully */
-	if(returnStatus != RTOS_SUCCESS)
+	if(returnStatus == RTOS_FAIL && waitTicks > 0)
 	{
-		if(waitTicks > 0)
+		/* Get the currently running thread */
+		RTOS_thread_t* pThread = RTOS_threadGetRunning();
+		/* Remove the thread from the ready list */
+		RTOS_listRemove(& pThread->listItem);
+		/* Set the items ordering value for the semaphores list */
+		pThread->eventListItem.orderValue = pThread->priority;
+		/* Add the thread to the semaphores list */
+		RTOS_listInsert(&pSemaphore->semaphoreList, & pThread->eventListItem);
+
+		/* Add the thread to timer's list */
+		if(waitTicks != RTOS_WAITFOREVER)
 		{
-			/* Get the currently running thread */
-			RTOS_thread_t* pThread = RTOS_threadGetRunning();
-			/* Remove the thread from the ready list */
-			RTOS_listRemove(& pThread->listItem);
-			/* Set the items ordering value for the semaphores list */
-			pThread->eventListItem.orderValue = pThread->priority;
-			/* Add the thread to the semaphores list */
-			RTOS_listInsert(&pSemaphore->semaphoreList, & pThread->eventListItem);
+			RTOS_threadAddToTimerList(pThread, waitTicks);
 
-			if(waitTicks == RTOS_WAITFOREVER)
-			{
-				/* The user wants to wait forever so we set the return status as success */
-				returnStatus = RTOS_SUCCESS;
-			}
-			/* Add the thread to timer's list */
-			else
-			{
-				RTOS_threadAddToTimerList(pThread, waitTicks);
-				returnStatus = RTOS_DELAY;
-			}
-			/* Invoke a pendSV exception */
-			SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 		}
-
 		else
 		{
 
 		}
+		returnStatus = RTOS_DELAY;
+		/* Invoke a pendSV exception */
+		SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 	}
 	else
 	{

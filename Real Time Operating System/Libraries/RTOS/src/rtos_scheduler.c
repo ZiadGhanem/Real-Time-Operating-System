@@ -11,7 +11,7 @@
 volatile uint32_t RTOS_systickCount;
 volatile uint32_t RTOS_SVC_excReturn;
 static RTOS_thread_t RTOS_idleThread;
-static RTOS_stack_t RTOS_idleThreadStack;
+static RTOS_stack_t RTOS_idleThreadStack[IDLE_THREAD_STACK_SIZE];
 
 /*
  * This is the idle thread function
@@ -35,7 +35,7 @@ static void RTOS_idleThreadFunc(void)
 void RTOS_schedulerStart(void)
 {
 	/* Create the idle thread */
-	RTOS_threadCreate(&RTOS_idleThread, &RTOS_idleThreadStack, RTOS_idleThreadFunc, MAX_PRIORITY_LEVEL - 1);
+	RTOS_threadCreate(&RTOS_idleThread, RTOS_idleThreadStack, IDLE_THREAD_STACK_SIZE, RTOS_idleThreadFunc, MAX_PRIORITY_LEVEL - 1);
 
 	/* Switch to the top priority ready thread */
 	RTOS_threadSwitch();

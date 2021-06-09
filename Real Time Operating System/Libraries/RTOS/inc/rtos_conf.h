@@ -14,6 +14,8 @@
 #define MAX_PRIORITY_LEVEL	16UL
 /* Maximum process stack size in double words*/
 #define MAX_STACK_SIZE	1024UL
+/* Stack Size for idle thread */
+#define IDLE_THREAD_STACK_SIZE 512UL
 /* Macro which makes synchronization methods wait forever */
 #define RTOS_WAITFOREVER UINT32_MAX
 

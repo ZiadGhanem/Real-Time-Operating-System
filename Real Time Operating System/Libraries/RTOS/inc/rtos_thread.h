@@ -13,11 +13,9 @@
 #include "rtos_scheduler.h"
 
 /** RTOS_stack_t
- * stack -> The stack of the process
+ *The stack of the process
  */
-typedef struct{
-	uint64_t stack[MAX_STACK_SIZE];
-}RTOS_stack_t;
+typedef uint64_t RTOS_stack_t;
 
 /* RTOS_taskState_t */
 typedef enum{
@@ -44,12 +42,12 @@ typedef struct{
 	RTOS_threadState_t threadState;
 }RTOS_thread_t;
 
-extern void RTOS_SVC_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, void* pFunction, uint32_t priority);
+extern void RTOS_SVC_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, uint32_t stackSize, void* pFunction, uint32_t priority);
 extern void RTOS_SVC_threadDelay(uint32_t waitTicks);
 extern void RTOS_SVC_threadTerminate(RTOS_thread_t* pThread);
 
 void RTOS_threadListsInit(void);
-void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, void* pFunction, uint32_t priority);
+void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, uint32_t stackSize, void* pFunction, uint32_t priority);
 RTOS_thread_t* RTOS_threadGetRunning(void);
 void RTOS_threadAddToReadyList(RTOS_thread_t* pThread);
 void RTOS_threadAddToTimerList(RTOS_thread_t* pThread, uint32_t waitTicks);

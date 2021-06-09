@@ -54,15 +54,15 @@
 
 	/****************** Switch threads ********************/
 	/* Disable all interrupts excepts SVC as PendSV can be interrupted */
-	MOV R1, #1
+	MOV R0, #1
 	MSR BASEPRI, R1
  	/* Get the next thread */
  	BL RTOS_threadSwitch
+ 	/* Enable all interrupts */
+	MOV R0, #0
+	MSR BASEPRI, R0
  	/* Set the process stack pointer to the thread's stack */
  	BL RTOS_threadGetRunning
-	/* Enable all interrupts */
-	MOV R1, #0
-	MSR BASEPRI, R1
 
 	/****************** Restoring the next thread's context ********************/
  	LDR R1, [R0]

@@ -28,7 +28,6 @@ SOFTWARE.
 */
 
 /* Includes */
-#include <stdint.h>
 #include "stm32f4xx.h"
 #include "rtos_thread.h"
 #include "rtos_scheduler.h"
@@ -38,24 +37,25 @@ SOFTWARE.
 #define RED_LED 14
 
 RTOS_thread_t thread[2];
-RTOS_stack_t stack[2];
+RTOS_stack_t stack[2][512];
 RTOS_mailBox_t mailbox;
 uint8_t buffer[10];
 
 void func_1(void)
 {
 	uint8_t val[] = {1, 0, 1, 0, 1, 0, 1, 0, 1, 0};
-	uint8_t idx = 0;
+	uint8_t idx;
 	while(1)
 	{
-		if(RTOS_SVC_mailBoxSend(&mailbox, &val[idx], 1000) == RTOS_SUCCESS)
+		for(idx = 0; idx < 10; idx ++)
 		{
+			if(RTOS_SVC_mailBoxSend(&mailbox, &val[idx], 1000) == RTOS_SUCCESS)
+			{
+			}
+			else
+			{
+			}
 		}
-		else
-		{
-		}
-		idx = (idx + 1) % 10;
-		RTOS_SVC_threadDelay(1000);
 	}
 }
 
@@ -64,7 +64,7 @@ void func_2(void)
 	uint8_t val;
 	while(1)
 	{
-		if(RTOS_SVC_mailBoxReceive(&mailbox, &val, 500) == RTOS_SUCCESS)
+		if(RTOS_SVC_mailBoxReceive(&mailbox, &val, RTOS_WAITFOREVER) == RTOS_SUCCESS)
 		{
 			GPIO_WriteBit(GPIOG, (1 << GREEN_LED), val);
 			GPIO_ResetBits(GPIOG, (1 << RED_LED));
@@ -74,6 +74,7 @@ void func_2(void)
 		{
 			GPIO_SetBits(GPIOG, (1 << RED_LED));
 		}
+		RTOS_SVC_threadDelay(1000);
 	}
 }
 
@@ -95,8 +96,8 @@ int main(void)
 
 	RTOS_init();
 
-	RTOS_SVC_threadCreate(&thread[0], &stack[0], func_1, 1);
-	RTOS_SVC_threadCreate(&thread[1], &stack[1], func_2, 1);
+	RTOS_SVC_threadCreate(&thread[0], stack[0], 512, func_1, 1);
+	RTOS_SVC_threadCreate(&thread[1], stack[1], 512, func_2, 1);
 
 	RTOS_SVC_mailBoxInit(&mailbox, &buffer, 10, 1);
 	RTOS_SVC_schedulerStart();

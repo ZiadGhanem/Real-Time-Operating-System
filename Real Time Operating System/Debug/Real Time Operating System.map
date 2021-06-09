@@ -11,7 +11,7 @@ Common symbol       size              file
 mailbox             0x50              src/main.o
 RTOS_systickCount   0x4               Libraries/RTOS/src/rtos_scheduler.o
 thread              0x70              src/main.o
-stack               0x4000            src/main.o
+stack               0x2000            src/main.o
 RTOS_SVC_excReturn  0x4               Libraries/RTOS/src/rtos_scheduler.o
 buffer              0xa               src/main.o
 
@@ -2023,7 +2023,7 @@ LOAD /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-
                 0x0000000008000000                g_pfnVectors
                 0x00000000080001ac                . = ALIGN (0x4)
 
-.text           0x00000000080001ac     0x165c
+.text           0x00000000080001ac     0x171c
                 0x00000000080001ac                . = ALIGN (0x4)
  *(.text)
  .text          0x00000000080001ac       0x40 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtbegin.o
@@ -2060,313 +2060,313 @@ LOAD /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-
                 0x00000000080003c0       0x94 Libraries/RTOS/src/rtos.o
                 0x00000000080003c0                RTOS_init
  .text.RTOS_SVC_Handler_Main
-                0x0000000008000454      0x260 Libraries/RTOS/src/rtos.o
+                0x0000000008000454      0x26c Libraries/RTOS/src/rtos.o
                 0x0000000008000454                RTOS_SVC_Handler_Main
  .text.RTOS_listInit
-                0x00000000080006b4       0x3c Libraries/RTOS/src/rtos_list.o
-                0x00000000080006b4                RTOS_listInit
+                0x00000000080006c0       0x3c Libraries/RTOS/src/rtos_list.o
+                0x00000000080006c0                RTOS_listInit
  .text.RTOS_listInsertEnd
-                0x00000000080006f0       0x62 Libraries/RTOS/src/rtos_list.o
-                0x00000000080006f0                RTOS_listInsertEnd
+                0x00000000080006fc       0x62 Libraries/RTOS/src/rtos_list.o
+                0x00000000080006fc                RTOS_listInsertEnd
  .text.RTOS_listInsert
-                0x0000000008000752       0x7e Libraries/RTOS/src/rtos_list.o
-                0x0000000008000752                RTOS_listInsert
+                0x000000000800075e       0x7e Libraries/RTOS/src/rtos_list.o
+                0x000000000800075e                RTOS_listInsert
  .text.RTOS_listRemove
-                0x00000000080007d0       0x68 Libraries/RTOS/src/rtos_list.o
-                0x00000000080007d0                RTOS_listRemove
+                0x00000000080007dc       0x68 Libraries/RTOS/src/rtos_list.o
+                0x00000000080007dc                RTOS_listRemove
  .text.RTOS_mailBoxInit
-                0x0000000008000838       0x80 Libraries/RTOS/src/rtos_mailbox.o
-                0x0000000008000838                RTOS_mailBoxInit
+                0x0000000008000844       0x80 Libraries/RTOS/src/rtos_mailbox.o
+                0x0000000008000844                RTOS_mailBoxInit
  .text.RTOS_mailBoxSend
-                0x00000000080008b8       0x7e Libraries/RTOS/src/rtos_mailbox.o
-                0x00000000080008b8                RTOS_mailBoxSend
+                0x00000000080008c4       0x7e Libraries/RTOS/src/rtos_mailbox.o
+                0x00000000080008c4                RTOS_mailBoxSend
  .text.RTOS_mailBoxReceive
-                0x0000000008000936       0x7e Libraries/RTOS/src/rtos_mailbox.o
-                0x0000000008000936                RTOS_mailBoxReceive
+                0x0000000008000942       0x7e Libraries/RTOS/src/rtos_mailbox.o
+                0x0000000008000942                RTOS_mailBoxReceive
  .text.RTOS_mutexInit
-                0x00000000080009b4       0x3a Libraries/RTOS/src/rtos_mutex.o
-                0x00000000080009b4                RTOS_mutexInit
- *fill*         0x00000000080009ee        0x2 
+                0x00000000080009c0       0x3a Libraries/RTOS/src/rtos_mutex.o
+                0x00000000080009c0                RTOS_mutexInit
+ *fill*         0x00000000080009fa        0x2 
  .text.RTOS_mutexLock
-                0x00000000080009f0       0xd8 Libraries/RTOS/src/rtos_mutex.o
-                0x00000000080009f0                RTOS_mutexLock
+                0x00000000080009fc       0xd0 Libraries/RTOS/src/rtos_mutex.o
+                0x00000000080009fc                RTOS_mutexLock
  .text.RTOS_mutexUnlock
-                0x0000000008000ac8       0x4c Libraries/RTOS/src/rtos_mutex.o
-                0x0000000008000ac8                RTOS_mutexUnlock
+                0x0000000008000acc       0x4c Libraries/RTOS/src/rtos_mutex.o
+                0x0000000008000acc                RTOS_mutexUnlock
  .text.RTOS_idleThreadFunc
-                0x0000000008000b14        0x6 Libraries/RTOS/src/rtos_scheduler.o
- *fill*         0x0000000008000b1a        0x2 
+                0x0000000008000b18        0x6 Libraries/RTOS/src/rtos_scheduler.o
+ *fill*         0x0000000008000b1e        0x2 
  .text.RTOS_schedulerStart
-                0x0000000008000b1c       0x74 Libraries/RTOS/src/rtos_scheduler.o
-                0x0000000008000b1c                RTOS_schedulerStart
+                0x0000000008000b20       0x7c Libraries/RTOS/src/rtos_scheduler.o
+                0x0000000008000b20                RTOS_schedulerStart
  .text.RTOS_SysTick_Handler
-                0x0000000008000b90       0x2c Libraries/RTOS/src/rtos_scheduler.o
-                0x0000000008000b90                RTOS_SysTick_Handler
+                0x0000000008000b9c       0x2c Libraries/RTOS/src/rtos_scheduler.o
+                0x0000000008000b9c                RTOS_SysTick_Handler
  .text.RTOS_schedulerGetSystickCount
-                0x0000000008000bbc       0x18 Libraries/RTOS/src/rtos_scheduler.o
-                0x0000000008000bbc                RTOS_schedulerGetSystickCount
+                0x0000000008000bc8       0x18 Libraries/RTOS/src/rtos_scheduler.o
+                0x0000000008000bc8                RTOS_schedulerGetSystickCount
  .text.RTOS_semaphoreInit
-                0x0000000008000bd4       0x2a Libraries/RTOS/src/rtos_semaphore.o
-                0x0000000008000bd4                RTOS_semaphoreInit
- *fill*         0x0000000008000bfe        0x2 
+                0x0000000008000be0       0x2a Libraries/RTOS/src/rtos_semaphore.o
+                0x0000000008000be0                RTOS_semaphoreInit
+ *fill*         0x0000000008000c0a        0x2 
  .text.RTOS_semaphoreWait
-                0x0000000008000c00       0xdc Libraries/RTOS/src/rtos_semaphore.o
-                0x0000000008000c00                RTOS_semaphoreWait
+                0x0000000008000c0c       0xd4 Libraries/RTOS/src/rtos_semaphore.o
+                0x0000000008000c0c                RTOS_semaphoreWait
  .text.RTOS_semaphoreSignal
-                0x0000000008000cdc       0x78 Libraries/RTOS/src/rtos_semaphore.o
-                0x0000000008000cdc                RTOS_semaphoreSignal
+                0x0000000008000ce0       0x78 Libraries/RTOS/src/rtos_semaphore.o
+                0x0000000008000ce0                RTOS_semaphoreSignal
  .text.RTOS_spinInit
-                0x0000000008000d54       0x36 Libraries/RTOS/src/rtos_spinlock.o
-                0x0000000008000d54                RTOS_spinInit
+                0x0000000008000d58       0x36 Libraries/RTOS/src/rtos_spinlock.o
+                0x0000000008000d58                RTOS_spinInit
  .text.RTOS_spinLock
-                0x0000000008000d8a       0x74 Libraries/RTOS/src/rtos_spinlock.o
-                0x0000000008000d8a                RTOS_spinLock
+                0x0000000008000d8e       0x74 Libraries/RTOS/src/rtos_spinlock.o
+                0x0000000008000d8e                RTOS_spinLock
  .text.RTOS_spinUnlock
-                0x0000000008000dfe       0x1e Libraries/RTOS/src/rtos_spinlock.o
-                0x0000000008000dfe                RTOS_spinUnlock
+                0x0000000008000e02       0x1e Libraries/RTOS/src/rtos_spinlock.o
+                0x0000000008000e02                RTOS_spinUnlock
  .text.RTOS_threadListsInit
-                0x0000000008000e1c       0x3c Libraries/RTOS/src/rtos_thread.o
-                0x0000000008000e1c                RTOS_threadListsInit
+                0x0000000008000e20       0x3c Libraries/RTOS/src/rtos_thread.o
+                0x0000000008000e20                RTOS_threadListsInit
  .text.RTOS_threadCreate
-                0x0000000008000e58      0x10c Libraries/RTOS/src/rtos_thread.o
-                0x0000000008000e58                RTOS_threadCreate
+                0x0000000008000e5c      0x1c0 Libraries/RTOS/src/rtos_thread.o
+                0x0000000008000e5c                RTOS_threadCreate
  .text.RTOS_threadGetRunning
-                0x0000000008000f64       0x18 Libraries/RTOS/src/rtos_thread.o
-                0x0000000008000f64                RTOS_threadGetRunning
+                0x000000000800101c       0x18 Libraries/RTOS/src/rtos_thread.o
+                0x000000000800101c                RTOS_threadGetRunning
  .text.RTOS_threadAddToReadyList
-                0x0000000008000f7c       0x78 Libraries/RTOS/src/rtos_thread.o
-                0x0000000008000f7c                RTOS_threadAddToReadyList
+                0x0000000008001034       0x78 Libraries/RTOS/src/rtos_thread.o
+                0x0000000008001034                RTOS_threadAddToReadyList
  .text.RTOS_threadAddToTimerList
-                0x0000000008000ff4       0x40 Libraries/RTOS/src/rtos_thread.o
-                0x0000000008000ff4                RTOS_threadAddToTimerList
+                0x00000000080010ac       0x40 Libraries/RTOS/src/rtos_thread.o
+                0x00000000080010ac                RTOS_threadAddToTimerList
  .text.RTOS_threadSwitch
-                0x0000000008001034       0xb8 Libraries/RTOS/src/rtos_thread.o
-                0x0000000008001034                RTOS_threadSwitch
+                0x00000000080010ec       0xb8 Libraries/RTOS/src/rtos_thread.o
+                0x00000000080010ec                RTOS_threadSwitch
  .text.RTOS_threadDelay
-                0x00000000080010ec       0x40 Libraries/RTOS/src/rtos_thread.o
-                0x00000000080010ec                RTOS_threadDelay
+                0x00000000080011a4       0x40 Libraries/RTOS/src/rtos_thread.o
+                0x00000000080011a4                RTOS_threadDelay
  .text.RTOS_threadDelayCheck
-                0x000000000800112c       0x40 Libraries/RTOS/src/rtos_thread.o
-                0x000000000800112c                RTOS_threadDelayCheck
+                0x00000000080011e4       0x40 Libraries/RTOS/src/rtos_thread.o
+                0x00000000080011e4                RTOS_threadDelayCheck
  .text.RTOS_threadTerminate
-                0x000000000800116c       0x58 Libraries/RTOS/src/rtos_thread.o
-                0x000000000800116c                RTOS_threadTerminate
+                0x0000000008001224       0x68 Libraries/RTOS/src/rtos_thread.o
+                0x0000000008001224                RTOS_threadTerminate
  .text.GPIO_Init
-                0x00000000080011c4      0x11c Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
-                0x00000000080011c4                GPIO_Init
+                0x000000000800128c      0x11c Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
+                0x000000000800128c                GPIO_Init
  .text.GPIO_SetBits
-                0x00000000080012e0       0x1e Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
-                0x00000000080012e0                GPIO_SetBits
+                0x00000000080013a8       0x1e Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
+                0x00000000080013a8                GPIO_SetBits
  .text.GPIO_ResetBits
-                0x00000000080012fe       0x1e Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
-                0x00000000080012fe                GPIO_ResetBits
+                0x00000000080013c6       0x1e Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
+                0x00000000080013c6                GPIO_ResetBits
  .text.GPIO_WriteBit
-                0x000000000800131c       0x30 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
-                0x000000000800131c                GPIO_WriteBit
+                0x00000000080013e4       0x30 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
+                0x00000000080013e4                GPIO_WriteBit
  .text.RCC_AHB1PeriphClockCmd
-                0x000000000800134c       0x40 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
-                0x000000000800134c                RCC_AHB1PeriphClockCmd
- .text.func_1   0x000000000800138c       0x5c src/main.o
-                0x000000000800138c                func_1
- .text.func_2   0x00000000080013e8       0x48 src/main.o
-                0x00000000080013e8                func_2
- .text.main     0x0000000008001430       0x7c src/main.o
-                0x0000000008001430                main
+                0x0000000008001414       0x40 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
+                0x0000000008001414                RCC_AHB1PeriphClockCmd
+ .text.func_1   0x0000000008001454       0x40 src/main.o
+                0x0000000008001454                func_1
+ .text.func_2   0x0000000008001494       0x50 src/main.o
+                0x0000000008001494                func_2
+ .text.main     0x00000000080014e4       0x88 src/main.o
+                0x00000000080014e4                main
  .text.Reset_Handler
-                0x00000000080014ac       0x50 src/startup_stm32f429x.o
-                0x00000000080014ac                Reset_Handler
+                0x000000000800156c       0x50 src/startup_stm32f429x.o
+                0x000000000800156c                Reset_Handler
  .text.Default_Handler
-                0x00000000080014fc        0x2 src/startup_stm32f429x.o
-                0x00000000080014fc                RTC_Alarm_IRQHandler
-                0x00000000080014fc                HASH_RNG_IRQHandler
-                0x00000000080014fc                EXTI2_IRQHandler
-                0x00000000080014fc                TIM8_CC_IRQHandler
-                0x00000000080014fc                UART8_IRQHandler
-                0x00000000080014fc                SPI4_IRQHandler
-                0x00000000080014fc                TIM1_CC_IRQHandler
-                0x00000000080014fc                DMA2_Stream5_IRQHandler
-                0x00000000080014fc                DMA1_Stream5_IRQHandler
-                0x00000000080014fc                PVD_IRQHandler
-                0x00000000080014fc                SDIO_IRQHandler
-                0x00000000080014fc                TAMP_STAMP_IRQHandler
-                0x00000000080014fc                CAN2_RX1_IRQHandler
-                0x00000000080014fc                EXTI3_IRQHandler
-                0x00000000080014fc                TIM8_TRG_COM_TIM14_IRQHandler
-                0x00000000080014fc                TIM1_UP_TIM10_IRQHandler
-                0x00000000080014fc                TIM8_UP_TIM13_IRQHandler
-                0x00000000080014fc                I2C3_ER_IRQHandler
-                0x00000000080014fc                EXTI0_IRQHandler
-                0x00000000080014fc                I2C2_EV_IRQHandler
-                0x00000000080014fc                DMA1_Stream2_IRQHandler
-                0x00000000080014fc                CAN1_RX0_IRQHandler
-                0x00000000080014fc                FPU_IRQHandler
-                0x00000000080014fc                OTG_HS_WKUP_IRQHandler
-                0x00000000080014fc                LTDC_ER_IRQHandler
-                0x00000000080014fc                CAN2_SCE_IRQHandler
-                0x00000000080014fc                DMA2_Stream2_IRQHandler
-                0x00000000080014fc                SPI1_IRQHandler
-                0x00000000080014fc                TIM6_DAC_IRQHandler
-                0x00000000080014fc                TIM1_BRK_TIM9_IRQHandler
-                0x00000000080014fc                DCMI_IRQHandler
-                0x00000000080014fc                CAN2_RX0_IRQHandler
-                0x00000000080014fc                DMA2_Stream3_IRQHandler
-                0x00000000080014fc                USART6_IRQHandler
-                0x00000000080014fc                USART3_IRQHandler
-                0x00000000080014fc                CRYP_IRQHandler
-                0x00000000080014fc                CAN1_RX1_IRQHandler
-                0x00000000080014fc                UART5_IRQHandler
-                0x00000000080014fc                DMA2_Stream0_IRQHandler
-                0x00000000080014fc                TIM4_IRQHandler
-                0x00000000080014fc                I2C1_EV_IRQHandler
-                0x00000000080014fc                DMA1_Stream6_IRQHandler
-                0x00000000080014fc                DMA1_Stream1_IRQHandler
-                0x00000000080014fc                UART4_IRQHandler
-                0x00000000080014fc                TIM3_IRQHandler
-                0x00000000080014fc                RCC_IRQHandler
-                0x00000000080014fc                TIM8_BRK_TIM12_IRQHandler
-                0x00000000080014fc                Default_Handler
-                0x00000000080014fc                EXTI15_10_IRQHandler
-                0x00000000080014fc                ADC_IRQHandler
-                0x00000000080014fc                DMA1_Stream7_IRQHandler
-                0x00000000080014fc                SPI5_IRQHandler
-                0x00000000080014fc                TIM7_IRQHandler
-                0x00000000080014fc                CAN2_TX_IRQHandler
-                0x00000000080014fc                TIM5_IRQHandler
-                0x00000000080014fc                DMA2_Stream7_IRQHandler
-                0x00000000080014fc                I2C3_EV_IRQHandler
-                0x00000000080014fc                EXTI9_5_IRQHandler
-                0x00000000080014fc                RTC_WKUP_IRQHandler
-                0x00000000080014fc                LTDC_IRQHandler
-                0x00000000080014fc                ETH_WKUP_IRQHandler
-                0x00000000080014fc                SPI2_IRQHandler
-                0x00000000080014fc                OTG_HS_EP1_IN_IRQHandler
-                0x00000000080014fc                DMA1_Stream0_IRQHandler
-                0x00000000080014fc                CAN1_TX_IRQHandler
-                0x00000000080014fc                EXTI4_IRQHandler
-                0x00000000080014fc                ETH_IRQHandler
-                0x00000000080014fc                OTG_HS_EP1_OUT_IRQHandler
-                0x00000000080014fc                WWDG_IRQHandler
-                0x00000000080014fc                SPI6_IRQHandler
-                0x00000000080014fc                TIM2_IRQHandler
-                0x00000000080014fc                OTG_FS_WKUP_IRQHandler
-                0x00000000080014fc                TIM1_TRG_COM_TIM11_IRQHandler
-                0x00000000080014fc                OTG_HS_IRQHandler
-                0x00000000080014fc                DMA2D_IRQHandler
-                0x00000000080014fc                EXTI1_IRQHandler
-                0x00000000080014fc                UART7_IRQHandler
-                0x00000000080014fc                USART2_IRQHandler
-                0x00000000080014fc                I2C2_ER_IRQHandler
-                0x00000000080014fc                DMA2_Stream1_IRQHandler
-                0x00000000080014fc                CAN1_SCE_IRQHandler
-                0x00000000080014fc                FLASH_IRQHandler
-                0x00000000080014fc                DMA2_Stream4_IRQHandler
-                0x00000000080014fc                USART1_IRQHandler
-                0x00000000080014fc                OTG_FS_IRQHandler
-                0x00000000080014fc                SPI3_IRQHandler
-                0x00000000080014fc                DMA1_Stream4_IRQHandler
-                0x00000000080014fc                I2C1_ER_IRQHandler
-                0x00000000080014fc                FMC_IRQHandler
-                0x00000000080014fc                DMA2_Stream6_IRQHandler
-                0x00000000080014fc                SAI1_IRQHandler
-                0x00000000080014fc                DMA1_Stream3_IRQHandler
+                0x00000000080015bc        0x2 src/startup_stm32f429x.o
+                0x00000000080015bc                RTC_Alarm_IRQHandler
+                0x00000000080015bc                HASH_RNG_IRQHandler
+                0x00000000080015bc                EXTI2_IRQHandler
+                0x00000000080015bc                TIM8_CC_IRQHandler
+                0x00000000080015bc                UART8_IRQHandler
+                0x00000000080015bc                SPI4_IRQHandler
+                0x00000000080015bc                TIM1_CC_IRQHandler
+                0x00000000080015bc                DMA2_Stream5_IRQHandler
+                0x00000000080015bc                DMA1_Stream5_IRQHandler
+                0x00000000080015bc                PVD_IRQHandler
+                0x00000000080015bc                SDIO_IRQHandler
+                0x00000000080015bc                TAMP_STAMP_IRQHandler
+                0x00000000080015bc                CAN2_RX1_IRQHandler
+                0x00000000080015bc                EXTI3_IRQHandler
+                0x00000000080015bc                TIM8_TRG_COM_TIM14_IRQHandler
+                0x00000000080015bc                TIM1_UP_TIM10_IRQHandler
+                0x00000000080015bc                TIM8_UP_TIM13_IRQHandler
+                0x00000000080015bc                I2C3_ER_IRQHandler
+                0x00000000080015bc                EXTI0_IRQHandler
+                0x00000000080015bc                I2C2_EV_IRQHandler
+                0x00000000080015bc                DMA1_Stream2_IRQHandler
+                0x00000000080015bc                CAN1_RX0_IRQHandler
+                0x00000000080015bc                FPU_IRQHandler
+                0x00000000080015bc                OTG_HS_WKUP_IRQHandler
+                0x00000000080015bc                LTDC_ER_IRQHandler
+                0x00000000080015bc                CAN2_SCE_IRQHandler
+                0x00000000080015bc                DMA2_Stream2_IRQHandler
+                0x00000000080015bc                SPI1_IRQHandler
+                0x00000000080015bc                TIM6_DAC_IRQHandler
+                0x00000000080015bc                TIM1_BRK_TIM9_IRQHandler
+                0x00000000080015bc                DCMI_IRQHandler
+                0x00000000080015bc                CAN2_RX0_IRQHandler
+                0x00000000080015bc                DMA2_Stream3_IRQHandler
+                0x00000000080015bc                USART6_IRQHandler
+                0x00000000080015bc                USART3_IRQHandler
+                0x00000000080015bc                CRYP_IRQHandler
+                0x00000000080015bc                CAN1_RX1_IRQHandler
+                0x00000000080015bc                UART5_IRQHandler
+                0x00000000080015bc                DMA2_Stream0_IRQHandler
+                0x00000000080015bc                TIM4_IRQHandler
+                0x00000000080015bc                I2C1_EV_IRQHandler
+                0x00000000080015bc                DMA1_Stream6_IRQHandler
+                0x00000000080015bc                DMA1_Stream1_IRQHandler
+                0x00000000080015bc                UART4_IRQHandler
+                0x00000000080015bc                TIM3_IRQHandler
+                0x00000000080015bc                RCC_IRQHandler
+                0x00000000080015bc                TIM8_BRK_TIM12_IRQHandler
+                0x00000000080015bc                Default_Handler
+                0x00000000080015bc                EXTI15_10_IRQHandler
+                0x00000000080015bc                ADC_IRQHandler
+                0x00000000080015bc                DMA1_Stream7_IRQHandler
+                0x00000000080015bc                SPI5_IRQHandler
+                0x00000000080015bc                TIM7_IRQHandler
+                0x00000000080015bc                CAN2_TX_IRQHandler
+                0x00000000080015bc                TIM5_IRQHandler
+                0x00000000080015bc                DMA2_Stream7_IRQHandler
+                0x00000000080015bc                I2C3_EV_IRQHandler
+                0x00000000080015bc                EXTI9_5_IRQHandler
+                0x00000000080015bc                RTC_WKUP_IRQHandler
+                0x00000000080015bc                LTDC_IRQHandler
+                0x00000000080015bc                ETH_WKUP_IRQHandler
+                0x00000000080015bc                SPI2_IRQHandler
+                0x00000000080015bc                OTG_HS_EP1_IN_IRQHandler
+                0x00000000080015bc                DMA1_Stream0_IRQHandler
+                0x00000000080015bc                CAN1_TX_IRQHandler
+                0x00000000080015bc                EXTI4_IRQHandler
+                0x00000000080015bc                ETH_IRQHandler
+                0x00000000080015bc                OTG_HS_EP1_OUT_IRQHandler
+                0x00000000080015bc                WWDG_IRQHandler
+                0x00000000080015bc                SPI6_IRQHandler
+                0x00000000080015bc                TIM2_IRQHandler
+                0x00000000080015bc                OTG_FS_WKUP_IRQHandler
+                0x00000000080015bc                TIM1_TRG_COM_TIM11_IRQHandler
+                0x00000000080015bc                OTG_HS_IRQHandler
+                0x00000000080015bc                DMA2D_IRQHandler
+                0x00000000080015bc                EXTI1_IRQHandler
+                0x00000000080015bc                UART7_IRQHandler
+                0x00000000080015bc                USART2_IRQHandler
+                0x00000000080015bc                I2C2_ER_IRQHandler
+                0x00000000080015bc                DMA2_Stream1_IRQHandler
+                0x00000000080015bc                CAN1_SCE_IRQHandler
+                0x00000000080015bc                FLASH_IRQHandler
+                0x00000000080015bc                DMA2_Stream4_IRQHandler
+                0x00000000080015bc                USART1_IRQHandler
+                0x00000000080015bc                OTG_FS_IRQHandler
+                0x00000000080015bc                SPI3_IRQHandler
+                0x00000000080015bc                DMA1_Stream4_IRQHandler
+                0x00000000080015bc                I2C1_ER_IRQHandler
+                0x00000000080015bc                FMC_IRQHandler
+                0x00000000080015bc                DMA2_Stream6_IRQHandler
+                0x00000000080015bc                SAI1_IRQHandler
+                0x00000000080015bc                DMA1_Stream3_IRQHandler
  .text.NMI_Handler
-                0x00000000080014fe        0xe src/stm32f4xx_it.o
-                0x00000000080014fe                NMI_Handler
+                0x00000000080015be        0xe src/stm32f4xx_it.o
+                0x00000000080015be                NMI_Handler
  .text.HardFault_Handler
-                0x000000000800150c        0x6 src/stm32f4xx_it.o
-                0x000000000800150c                HardFault_Handler
+                0x00000000080015cc        0x6 src/stm32f4xx_it.o
+                0x00000000080015cc                HardFault_Handler
  .text.MemManage_Handler
-                0x0000000008001512        0x6 src/stm32f4xx_it.o
-                0x0000000008001512                MemManage_Handler
+                0x00000000080015d2        0x6 src/stm32f4xx_it.o
+                0x00000000080015d2                MemManage_Handler
  .text.BusFault_Handler
-                0x0000000008001518        0x6 src/stm32f4xx_it.o
-                0x0000000008001518                BusFault_Handler
+                0x00000000080015d8        0x6 src/stm32f4xx_it.o
+                0x00000000080015d8                BusFault_Handler
  .text.UsageFault_Handler
-                0x000000000800151e        0x6 src/stm32f4xx_it.o
-                0x000000000800151e                UsageFault_Handler
+                0x00000000080015de        0x6 src/stm32f4xx_it.o
+                0x00000000080015de                UsageFault_Handler
  .text.DebugMon_Handler
-                0x0000000008001524        0xe src/stm32f4xx_it.o
-                0x0000000008001524                DebugMon_Handler
- *fill*         0x0000000008001532        0x2 
+                0x00000000080015e4        0xe src/stm32f4xx_it.o
+                0x00000000080015e4                DebugMon_Handler
+ *fill*         0x00000000080015f2        0x2 
  .text.SystemInit
-                0x0000000008001534       0x6c src/system_stm32f4xx.o
-                0x0000000008001534                SystemInit
+                0x00000000080015f4       0x6c src/system_stm32f4xx.o
+                0x00000000080015f4                SystemInit
  .text.SystemCoreClockUpdate
-                0x00000000080015a0       0xf8 src/system_stm32f4xx.o
-                0x00000000080015a0                SystemCoreClockUpdate
+                0x0000000008001660       0xf8 src/system_stm32f4xx.o
+                0x0000000008001660                SystemCoreClockUpdate
  .text.SetSysClock
-                0x0000000008001698       0xf8 src/system_stm32f4xx.o
+                0x0000000008001758       0xf8 src/system_stm32f4xx.o
  .text.__libc_init_array
-                0x0000000008001790       0x48 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/libc_nano.a(lib_a-init.o)
-                0x0000000008001790                __libc_init_array
- .text.memcpy   0x00000000080017d8       0x16 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/libc_nano.a(lib_a-memcpy-stub.o)
-                0x00000000080017d8                memcpy
+                0x0000000008001850       0x48 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/libc_nano.a(lib_a-init.o)
+                0x0000000008001850                __libc_init_array
+ .text.memcpy   0x0000000008001898       0x16 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/libc_nano.a(lib_a-memcpy-stub.o)
+                0x0000000008001898                memcpy
  *(.glue_7)
- .glue_7        0x00000000080017ee        0x0 linker stubs
+ .glue_7        0x00000000080018ae        0x0 linker stubs
  *(.glue_7t)
- .glue_7t       0x00000000080017ee        0x0 linker stubs
+ .glue_7t       0x00000000080018ae        0x0 linker stubs
  *(.eh_frame)
- *fill*         0x00000000080017ee        0x2 
- .eh_frame      0x00000000080017f0        0x0 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtbegin.o
+ *fill*         0x00000000080018ae        0x2 
+ .eh_frame      0x00000000080018b0        0x0 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtbegin.o
  *(.init)
- .init          0x00000000080017f0        0x4 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crti.o
-                0x00000000080017f0                _init
- .init          0x00000000080017f4        0x8 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtn.o
+ .init          0x00000000080018b0        0x4 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crti.o
+                0x00000000080018b0                _init
+ .init          0x00000000080018b4        0x8 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtn.o
  *(.fini)
- .fini          0x00000000080017fc        0x4 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crti.o
-                0x00000000080017fc                _fini
- .fini          0x0000000008001800        0x8 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtn.o
-                0x0000000008001808                . = ALIGN (0x4)
-                0x0000000008001808                _etext = .
+ .fini          0x00000000080018bc        0x4 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crti.o
+                0x00000000080018bc                _fini
+ .fini          0x00000000080018c0        0x8 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtn.o
+                0x00000000080018c8                . = ALIGN (0x4)
+                0x00000000080018c8                _etext = .
 
-.vfp11_veneer   0x0000000008001808        0x0
- .vfp11_veneer  0x0000000008001808        0x0 linker stubs
+.vfp11_veneer   0x00000000080018c8        0x0
+ .vfp11_veneer  0x00000000080018c8        0x0 linker stubs
 
-.v4_bx          0x0000000008001808        0x0
- .v4_bx         0x0000000008001808        0x0 linker stubs
+.v4_bx          0x00000000080018c8        0x0
+ .v4_bx         0x00000000080018c8        0x0 linker stubs
 
-.iplt           0x0000000008001808        0x0
- .iplt          0x0000000008001808        0x0 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtbegin.o
+.iplt           0x00000000080018c8        0x0
+ .iplt          0x00000000080018c8        0x0 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtbegin.o
 
-.rodata         0x0000000008001808       0x14
-                0x0000000008001808                . = ALIGN (0x4)
+.rodata         0x00000000080018c8       0x14
+                0x00000000080018c8                . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x0000000008001808       0x14 src/main.o
+ .rodata        0x00000000080018c8       0x14 src/main.o
  *(.rodata*)
-                0x000000000800181c                . = ALIGN (0x4)
+                0x00000000080018dc                . = ALIGN (0x4)
 
-.rel.dyn        0x000000000800181c        0x0
- .rel.iplt      0x000000000800181c        0x0 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtbegin.o
+.rel.dyn        0x00000000080018dc        0x0
+ .rel.iplt      0x00000000080018dc        0x0 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtbegin.o
 
 .ARM.extab
  *(.ARM.extab* .gnu.linkonce.armextab.*)
 
-.ARM            0x000000000800181c        0x0
-                0x000000000800181c                __exidx_start = .
+.ARM            0x00000000080018dc        0x0
+                0x00000000080018dc                __exidx_start = .
  *(.ARM.exidx*)
-                0x000000000800181c                __exidx_end = .
+                0x00000000080018dc                __exidx_end = .
 
-.preinit_array  0x000000000800181c        0x0
-                0x000000000800181c                PROVIDE (__preinit_array_start, .)
+.preinit_array  0x00000000080018dc        0x0
+                0x00000000080018dc                PROVIDE (__preinit_array_start, .)
  *(.preinit_array*)
-                0x000000000800181c                PROVIDE (__preinit_array_end, .)
+                0x00000000080018dc                PROVIDE (__preinit_array_end, .)
 
-.init_array     0x000000000800181c        0x4
-                0x000000000800181c                PROVIDE (__init_array_start, .)
+.init_array     0x00000000080018dc        0x4
+                0x00000000080018dc                PROVIDE (__init_array_start, .)
  *(SORT(.init_array.*))
  *(.init_array*)
- .init_array    0x000000000800181c        0x4 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtbegin.o
-                0x0000000008001820                PROVIDE (__init_array_end, .)
+ .init_array    0x00000000080018dc        0x4 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtbegin.o
+                0x00000000080018e0                PROVIDE (__init_array_end, .)
 
-.fini_array     0x0000000008001820        0x4
+.fini_array     0x00000000080018e0        0x4
                 [!provide]                        PROVIDE (__fini_array_start, .)
  *(SORT(.fini_array.*))
  *(.fini_array*)
- .fini_array    0x0000000008001820        0x4 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtbegin.o
+ .fini_array    0x00000000080018e0        0x4 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtbegin.o
                 [!provide]                        PROVIDE (__fini_array_end, .)
-                0x0000000008001824                _sidata = LOADADDR (.data)
+                0x00000000080018e4                _sidata = LOADADDR (.data)
 
-.data           0x0000000020000000       0x1c load address 0x0000000008001824
+.data           0x0000000020000000       0x1c load address 0x00000000080018e4
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                _sdata = .
  *(.data)
@@ -2383,12 +2383,12 @@ LOAD /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-
                 0x000000002000000c                AHBPrescTable
                 0x000000002000001c                . = ALIGN (0x4)
                 0x000000002000001c                _edata = .
-                0x0000000008001840                _siccmram = LOADADDR (.ccmram)
+                0x0000000008001900                _siccmram = LOADADDR (.ccmram)
 
-.igot.plt       0x000000002000001c        0x0 load address 0x0000000008001840
+.igot.plt       0x000000002000001c        0x0 load address 0x0000000008001900
  .igot.plt      0x000000002000001c        0x0 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtbegin.o
 
-.ccmram         0x0000000010000000        0x0 load address 0x0000000008001840
+.ccmram         0x0000000010000000        0x0 load address 0x0000000008001900
                 0x0000000010000000                . = ALIGN (0x4)
                 0x0000000010000000                _sccmram = .
  *(.ccmram)
@@ -2397,7 +2397,7 @@ LOAD /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-
                 0x0000000010000000                _eccmram = .
                 0x0000000010000000                . = ALIGN (0x4)
 
-.bss            0x0000000020000020     0x6244
+.bss            0x0000000020000020     0x3244
                 0x0000000020000020                _sbss = .
                 0x0000000020000020                __bss_start__ = _sbss
  *(.bss)
@@ -2407,38 +2407,38 @@ LOAD /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-
                 0x000000002000003c       0x38 Libraries/RTOS/src/rtos_scheduler.o
  *fill*         0x0000000020000074        0x4 
  .bss.RTOS_idleThreadStack
-                0x0000000020000078     0x2000 Libraries/RTOS/src/rtos_scheduler.o
+                0x0000000020000078     0x1000 Libraries/RTOS/src/rtos_scheduler.o
  .bss.pRunningThread
-                0x0000000020002078        0x4 Libraries/RTOS/src/rtos_thread.o
+                0x0000000020001078        0x4 Libraries/RTOS/src/rtos_thread.o
  .bss.RTOS_readyList
-                0x000000002000207c      0x100 Libraries/RTOS/src/rtos_thread.o
+                0x000000002000107c      0x100 Libraries/RTOS/src/rtos_thread.o
  .bss.RTOS_delayList
-                0x000000002000217c       0x10 Libraries/RTOS/src/rtos_thread.o
+                0x000000002000117c       0x10 Libraries/RTOS/src/rtos_thread.o
  .bss.numThreads
-                0x000000002000218c        0x4 Libraries/RTOS/src/rtos_thread.o
+                0x000000002000118c        0x4 Libraries/RTOS/src/rtos_thread.o
  *(COMMON)
- COMMON         0x0000000020002190        0x8 Libraries/RTOS/src/rtos_scheduler.o
-                0x0000000020002190                RTOS_systickCount
-                0x0000000020002194                RTOS_SVC_excReturn
- COMMON         0x0000000020002198     0x40ca src/main.o
-                0x0000000020002198                mailbox
-                0x00000000200021e8                thread
-                0x0000000020002258                stack
-                0x0000000020006258                buffer
-                0x0000000020006264                . = ALIGN (0x4)
- *fill*         0x0000000020006262        0x2 
-                0x0000000020006264                _ebss = .
-                0x0000000020006264                __bss_end__ = _ebss
+ COMMON         0x0000000020001190        0x8 Libraries/RTOS/src/rtos_scheduler.o
+                0x0000000020001190                RTOS_systickCount
+                0x0000000020001194                RTOS_SVC_excReturn
+ COMMON         0x0000000020001198     0x20ca src/main.o
+                0x0000000020001198                mailbox
+                0x00000000200011e8                thread
+                0x0000000020001258                stack
+                0x0000000020003258                buffer
+                0x0000000020003264                . = ALIGN (0x4)
+ *fill*         0x0000000020003262        0x2 
+                0x0000000020003264                _ebss = .
+                0x0000000020003264                __bss_end__ = _ebss
 
 ._user_heap_stack
-                0x0000000020006264      0x400
-                0x0000000020006264                . = ALIGN (0x4)
+                0x0000000020003264      0x400
+                0x0000000020003264                . = ALIGN (0x4)
                 [!provide]                        PROVIDE (end, .)
                 [!provide]                        PROVIDE (_end, .)
-                0x0000000020006264                . = (. + _Min_Heap_Size)
-                0x0000000020006664                . = (. + _Min_Stack_Size)
- *fill*         0x0000000020006264      0x400 
-                0x0000000020006664                . = ALIGN (0x4)
+                0x0000000020003264                . = (. + _Min_Heap_Size)
+                0x0000000020003664                . = (. + _Min_Stack_Size)
+ *fill*         0x0000000020003264      0x400 
+                0x0000000020003664                . = ALIGN (0x4)
 
 .memory_b1_text
  *(.mb1text)
@@ -2498,41 +2498,41 @@ LOAD /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-
                 0x000000000000040e       0x22 /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtn.o
 OUTPUT(Real Time Operating System.elf elf32-littlearm)
 
-.debug_info     0x0000000000000000     0x9942
- .debug_info    0x0000000000000000     0x12dc Libraries/RTOS/src/rtos.o
- .debug_info    0x00000000000012dc       0xbb Libraries/RTOS/src/rtos_handlers.o
- .debug_info    0x0000000000001397      0xad8 Libraries/RTOS/src/rtos_list.o
- .debug_info    0x0000000000001e6f      0xbdb Libraries/RTOS/src/rtos_mailbox.o
- .debug_info    0x0000000000002a4a      0xe4b Libraries/RTOS/src/rtos_mutex.o
- .debug_info    0x0000000000003895      0xd1c Libraries/RTOS/src/rtos_scheduler.o
- .debug_info    0x00000000000045b1      0xeae Libraries/RTOS/src/rtos_semaphore.o
- .debug_info    0x000000000000545f      0xaff Libraries/RTOS/src/rtos_spinlock.o
- .debug_info    0x0000000000005f5e       0xbc Libraries/RTOS/src/rtos_svc_calls.o
- .debug_info    0x000000000000601a      0xece Libraries/RTOS/src/rtos_thread.o
- .debug_info    0x0000000000006ee8      0x628 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
- .debug_info    0x0000000000007510      0xe36 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
- .debug_info    0x0000000000008346      0xe01 src/main.o
- .debug_info    0x0000000000009147       0xad src/startup_stm32f429x.o
- .debug_info    0x00000000000091f4      0x154 src/stm32f4xx_it.o
- .debug_info    0x0000000000009348      0x5fa src/system_stm32f4xx.o
+.debug_info     0x0000000000000000     0x98a6
+ .debug_info    0x0000000000000000     0x12b5 Libraries/RTOS/src/rtos.o
+ .debug_info    0x00000000000012b5       0xbb Libraries/RTOS/src/rtos_handlers.o
+ .debug_info    0x0000000000001370      0xad8 Libraries/RTOS/src/rtos_list.o
+ .debug_info    0x0000000000001e48      0xbdb Libraries/RTOS/src/rtos_mailbox.o
+ .debug_info    0x0000000000002a23      0xe4b Libraries/RTOS/src/rtos_mutex.o
+ .debug_info    0x000000000000386e      0xd06 Libraries/RTOS/src/rtos_scheduler.o
+ .debug_info    0x0000000000004574      0xeae Libraries/RTOS/src/rtos_semaphore.o
+ .debug_info    0x0000000000005422      0xaff Libraries/RTOS/src/rtos_spinlock.o
+ .debug_info    0x0000000000005f21       0xbc Libraries/RTOS/src/rtos_svc_calls.o
+ .debug_info    0x0000000000005fdd      0xe8f Libraries/RTOS/src/rtos_thread.o
+ .debug_info    0x0000000000006e6c      0x628 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
+ .debug_info    0x0000000000007494      0xe36 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
+ .debug_info    0x00000000000082ca      0xde1 src/main.o
+ .debug_info    0x00000000000090ab       0xad src/startup_stm32f429x.o
+ .debug_info    0x0000000000009158      0x154 src/stm32f4xx_it.o
+ .debug_info    0x00000000000092ac      0x5fa src/system_stm32f4xx.o
 
-.debug_abbrev   0x0000000000000000     0x1a00
- .debug_abbrev  0x0000000000000000      0x2be Libraries/RTOS/src/rtos.o
- .debug_abbrev  0x00000000000002be       0x14 Libraries/RTOS/src/rtos_handlers.o
- .debug_abbrev  0x00000000000002d2      0x1b6 Libraries/RTOS/src/rtos_list.o
- .debug_abbrev  0x0000000000000488      0x1ea Libraries/RTOS/src/rtos_mailbox.o
- .debug_abbrev  0x0000000000000672      0x25b Libraries/RTOS/src/rtos_mutex.o
- .debug_abbrev  0x00000000000008cd      0x282 Libraries/RTOS/src/rtos_scheduler.o
- .debug_abbrev  0x0000000000000b4f      0x25b Libraries/RTOS/src/rtos_semaphore.o
- .debug_abbrev  0x0000000000000daa      0x243 Libraries/RTOS/src/rtos_spinlock.o
- .debug_abbrev  0x0000000000000fed       0x14 Libraries/RTOS/src/rtos_svc_calls.o
- .debug_abbrev  0x0000000000001001      0x280 Libraries/RTOS/src/rtos_thread.o
- .debug_abbrev  0x0000000000001281      0x1b8 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
- .debug_abbrev  0x0000000000001439      0x1cf Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
- .debug_abbrev  0x0000000000001608      0x216 src/main.o
- .debug_abbrev  0x000000000000181e       0x12 src/startup_stm32f429x.o
- .debug_abbrev  0x0000000000001830       0x78 src/stm32f4xx_it.o
- .debug_abbrev  0x00000000000018a8      0x158 src/system_stm32f4xx.o
+.debug_abbrev   0x0000000000000000     0x19b8
+ .debug_abbrev  0x0000000000000000      0x2b1 Libraries/RTOS/src/rtos.o
+ .debug_abbrev  0x00000000000002b1       0x14 Libraries/RTOS/src/rtos_handlers.o
+ .debug_abbrev  0x00000000000002c5      0x1b6 Libraries/RTOS/src/rtos_list.o
+ .debug_abbrev  0x000000000000047b      0x1ea Libraries/RTOS/src/rtos_mailbox.o
+ .debug_abbrev  0x0000000000000665      0x25b Libraries/RTOS/src/rtos_mutex.o
+ .debug_abbrev  0x00000000000008c0      0x275 Libraries/RTOS/src/rtos_scheduler.o
+ .debug_abbrev  0x0000000000000b35      0x25b Libraries/RTOS/src/rtos_semaphore.o
+ .debug_abbrev  0x0000000000000d90      0x243 Libraries/RTOS/src/rtos_spinlock.o
+ .debug_abbrev  0x0000000000000fd3       0x14 Libraries/RTOS/src/rtos_svc_calls.o
+ .debug_abbrev  0x0000000000000fe7      0x25f Libraries/RTOS/src/rtos_thread.o
+ .debug_abbrev  0x0000000000001246      0x1b8 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
+ .debug_abbrev  0x00000000000013fe      0x1cf Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
+ .debug_abbrev  0x00000000000015cd      0x209 src/main.o
+ .debug_abbrev  0x00000000000017d6       0x12 src/startup_stm32f429x.o
+ .debug_abbrev  0x00000000000017e8       0x78 src/stm32f4xx_it.o
+ .debug_abbrev  0x0000000000001860      0x158 src/system_stm32f4xx.o
 
 .debug_aranges  0x0000000000000000      0x540
  .debug_aranges
@@ -2584,50 +2584,50 @@ OUTPUT(Real Time Operating System.elf elf32-littlearm)
  .debug_ranges  0x00000000000003b8       0x50 src/stm32f4xx_it.o
  .debug_ranges  0x0000000000000408       0x20 src/system_stm32f4xx.o
 
-.debug_line     0x0000000000000000     0x2c84
- .debug_line    0x0000000000000000      0x3b1 Libraries/RTOS/src/rtos.o
- .debug_line    0x00000000000003b1       0x7b Libraries/RTOS/src/rtos_handlers.o
- .debug_line    0x000000000000042c      0x336 Libraries/RTOS/src/rtos_list.o
- .debug_line    0x0000000000000762      0x359 Libraries/RTOS/src/rtos_mailbox.o
- .debug_line    0x0000000000000abb      0x332 Libraries/RTOS/src/rtos_mutex.o
- .debug_line    0x0000000000000ded      0x2d8 Libraries/RTOS/src/rtos_scheduler.o
- .debug_line    0x00000000000010c5      0x35e Libraries/RTOS/src/rtos_semaphore.o
- .debug_line    0x0000000000001423      0x304 Libraries/RTOS/src/rtos_spinlock.o
- .debug_line    0x0000000000001727       0x75 Libraries/RTOS/src/rtos_svc_calls.o
- .debug_line    0x000000000000179c      0x39f Libraries/RTOS/src/rtos_thread.o
- .debug_line    0x0000000000001b3b      0x372 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
- .debug_line    0x0000000000001ead      0x64e Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
- .debug_line    0x00000000000024fb      0x2f1 src/main.o
- .debug_line    0x00000000000027ec       0x7a src/startup_stm32f429x.o
- .debug_line    0x0000000000002866      0x214 src/stm32f4xx_it.o
- .debug_line    0x0000000000002a7a      0x20a src/system_stm32f4xx.o
+.debug_line     0x0000000000000000     0x2caf
+ .debug_line    0x0000000000000000      0x3b3 Libraries/RTOS/src/rtos.o
+ .debug_line    0x00000000000003b3       0x7b Libraries/RTOS/src/rtos_handlers.o
+ .debug_line    0x000000000000042e      0x336 Libraries/RTOS/src/rtos_list.o
+ .debug_line    0x0000000000000764      0x359 Libraries/RTOS/src/rtos_mailbox.o
+ .debug_line    0x0000000000000abd      0x335 Libraries/RTOS/src/rtos_mutex.o
+ .debug_line    0x0000000000000df2      0x2d8 Libraries/RTOS/src/rtos_scheduler.o
+ .debug_line    0x00000000000010ca      0x361 Libraries/RTOS/src/rtos_semaphore.o
+ .debug_line    0x000000000000142b      0x304 Libraries/RTOS/src/rtos_spinlock.o
+ .debug_line    0x000000000000172f       0x75 Libraries/RTOS/src/rtos_svc_calls.o
+ .debug_line    0x00000000000017a4      0x3be Libraries/RTOS/src/rtos_thread.o
+ .debug_line    0x0000000000001b62      0x372 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
+ .debug_line    0x0000000000001ed4      0x64e Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
+ .debug_line    0x0000000000002522      0x2f5 src/main.o
+ .debug_line    0x0000000000002817       0x7a src/startup_stm32f429x.o
+ .debug_line    0x0000000000002891      0x214 src/stm32f4xx_it.o
+ .debug_line    0x0000000000002aa5      0x20a src/system_stm32f4xx.o
 
-.debug_str      0x0000000000000000     0x1fe8
- .debug_str     0x0000000000000000      0xf20 Libraries/RTOS/src/rtos.o
-                                        0xfdd (size before relaxing)
- .debug_str     0x0000000000000f20       0x7a Libraries/RTOS/src/rtos_list.o
+.debug_str      0x0000000000000000     0x1ff2
+ .debug_str     0x0000000000000000      0xf1a Libraries/RTOS/src/rtos.o
+                                        0xfd7 (size before relaxing)
+ .debug_str     0x0000000000000f1a       0x7a Libraries/RTOS/src/rtos_list.o
                                         0x734 (size before relaxing)
- .debug_str     0x0000000000000f9a       0x6e Libraries/RTOS/src/rtos_mailbox.o
+ .debug_str     0x0000000000000f94       0x6e Libraries/RTOS/src/rtos_mailbox.o
                                         0x80f (size before relaxing)
- .debug_str     0x0000000000001008       0x80 Libraries/RTOS/src/rtos_mutex.o
+ .debug_str     0x0000000000001002       0x80 Libraries/RTOS/src/rtos_mutex.o
                                         0x8c3 (size before relaxing)
- .debug_str     0x0000000000001088      0x113 Libraries/RTOS/src/rtos_scheduler.o
-                                        0x8d9 (size before relaxing)
- .debug_str     0x000000000000119b       0x6d Libraries/RTOS/src/rtos_semaphore.o
+ .debug_str     0x0000000000001082      0x113 Libraries/RTOS/src/rtos_scheduler.o
+                                        0x8d3 (size before relaxing)
+ .debug_str     0x0000000000001195       0x6d Libraries/RTOS/src/rtos_semaphore.o
                                         0x8df (size before relaxing)
- .debug_str     0x0000000000001208       0x5c Libraries/RTOS/src/rtos_spinlock.o
+ .debug_str     0x0000000000001202       0x5c Libraries/RTOS/src/rtos_spinlock.o
                                         0x732 (size before relaxing)
- .debug_str     0x0000000000001264      0x148 Libraries/RTOS/src/rtos_thread.o
-                                        0x957 (size before relaxing)
- .debug_str     0x00000000000013ac      0x33f Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
+ .debug_str     0x000000000000125e      0x152 Libraries/RTOS/src/rtos_thread.o
+                                        0x95b (size before relaxing)
+ .debug_str     0x00000000000013b0      0x33f Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
                                         0x55e (size before relaxing)
- .debug_str     0x00000000000016eb      0x7a1 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
+ .debug_str     0x00000000000016ef      0x7a1 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
                                         0xa58 (size before relaxing)
- .debug_str     0x0000000000001e8c       0x37 src/main.o
+ .debug_str     0x0000000000001e90       0x3d src/main.o
                                         0xa36 (size before relaxing)
- .debug_str     0x0000000000001ec3       0x96 src/stm32f4xx_it.o
+ .debug_str     0x0000000000001ecd       0x96 src/stm32f4xx_it.o
                                         0x2aa (size before relaxing)
- .debug_str     0x0000000000001f59       0x8f src/system_stm32f4xx.o
+ .debug_str     0x0000000000001f63       0x8f src/system_stm32f4xx.o
                                         0x450 (size before relaxing)
 
 .comment        0x0000000000000000       0x7c
