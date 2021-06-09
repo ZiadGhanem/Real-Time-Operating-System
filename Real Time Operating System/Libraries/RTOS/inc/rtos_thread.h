@@ -8,6 +8,9 @@
 #ifndef RTOS_INC_RTOS_THREAD_H_
 #define RTOS_INC_RTOS_THREAD_H_
 
+#include "rtos.h"
+#include "rtos_list.h"
+#include "rtos_scheduler.h"
 
 /** RTOS_stack_t
  * stack -> The stack of the process
@@ -27,7 +30,8 @@ typedef enum{
 /** RTOS_thread_t
  * pStack -> Pointer to the stack of the thread
  * priority -> Priority level of the thread (Lower is higher)
- * listItem -> The list item to be inserted in the list
+ * listItem -> The list item to be inserted in the ready lists
+ * eventListItem -> The list item to be inserted in the event list
  * threadId -> Number of the thread
  * threadState -> The current state of the thread
  */
@@ -35,20 +39,22 @@ typedef struct{
 	uint32_t pStack;
 	uint32_t priority;
 	RTOS_listItem_t listItem;
+	RTOS_listItem_t eventListItem;
 	int32_t threadId;
 	RTOS_threadState_t threadState;
 }RTOS_thread_t;
 
 extern void RTOS_SVC_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, void* pFunction, uint32_t priority);
-extern void RTOS_SVC_threadDelay(uint32_t systicks);
+extern void RTOS_SVC_threadDelay(uint32_t waitTicks);
 extern void RTOS_SVC_threadTerminate(RTOS_thread_t* pThread);
 
 void RTOS_threadListsInit(void);
 void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, void* pFunction, uint32_t priority);
 RTOS_thread_t* RTOS_threadGetRunning(void);
 void RTOS_threadAddToReadyList(RTOS_thread_t* pThread);
+void RTOS_threadAddToTimerList(RTOS_thread_t* pThread, uint32_t waitTicks);
 void RTOS_threadSwitch(void);
-void RTOS_threadDelay(uint32_t systicks);
+void RTOS_threadDelay(uint32_t waitTicks);
 void RTOS_threadDelayCheck(void);
 void RTOS_threadTerminate(RTOS_thread_t* pThread);
 

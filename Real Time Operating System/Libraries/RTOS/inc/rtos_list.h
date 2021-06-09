@@ -8,6 +8,7 @@
 #ifndef RTOS_INC_RTOS_LIST_H_
 #define RTOS_INC_RTOS_LIST_H_
 
+#include "rtos.h"
 
 /** RTOS list item
  * pNext -> Pointer to the next item in the list

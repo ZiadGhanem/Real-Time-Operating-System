@@ -5,7 +5,7 @@
  *      Author: ziadyasser
  */
 
-#include "rtos.h"
+#include "rtos_spinlock.h"
 
 /*
  * This function initializes the spinlock
@@ -15,8 +15,9 @@
  * Return:
  * 	None
  */
-void RTOS_spinInit(RTOS_spinLock_t* pSpinLock, int32_t value)
+void RTOS_spinInit(RTOS_spinLock_t* pSpinLock, uint32_t value)
 {
+	ASSERT(pSpinLock != NULL);
 	ASSERT((value == RTOS_SPINLOCK_USED) || (value == RTOS_SPINLOCK_FREE));
 	/* Set the mutex value */
 	pSpinLock->value = value;
@@ -28,23 +29,32 @@ void RTOS_spinInit(RTOS_spinLock_t* pSpinLock, int32_t value)
  * Inputs:
  *  pMutex -> Pointer to the SpinLock
  * Return:
- * 	None
+ * 	States whether the spinlock was acquired successfully or not
  */
 
-void RTOS_spinLock(RTOS_spinLock_t* pSpinLock)
+RTOS_returnStatus RTOS_spinLock(RTOS_spinLock_t* pSpinLock)
 {
-	while(1)
+	uint8_t terminate = 0;
+	uint32_t value;
+	RTOS_returnStatus returnStatus = RTOS_DELAY;
+
+	/* Keep trying until this section does not get preempted */
+	while(!terminate)
 	{
-		/* Read the spinlock value */
-		/* If the spinlock is free */
-		if((int32_t)__LDREXW((uint32_t*) &pSpinLock->value) == RTOS_SPINLOCK_FREE)
+		/* Load the spinlock value */
+		value = __LDREXW(&pSpinLock->value);
+		/* Check if the spinlock can be acquired */
+		if(value == RTOS_SPINLOCK_FREE)
 		{
-			/* Set the spinlock as used, If we failed to set the spinlock value then just keep trying */
-			if(__STREXW(RTOS_SPINLOCK_USED, (uint32_t*) &pSpinLock->value) == 0)
+			/* Attempt to store the spinlock */
+			if( __STREXW(value, &pSpinLock->value) == 0)
 			{
 				/* Data Memory Barrier */
 				__DMB();
-				return;
+				/* Set the spinlock as acquired */
+				returnStatus = RTOS_SUCCESS;
+				/* End loop */
+				terminate = 1;
 			}
 			else
 			{
@@ -53,9 +63,14 @@ void RTOS_spinLock(RTOS_spinLock_t* pSpinLock)
 		}
 		else
 		{
+			/* End loop */
+			terminate = 1;
 
 		}
+
 	}
+
+	return returnStatus;
 }
 
 

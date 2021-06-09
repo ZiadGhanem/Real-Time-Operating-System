@@ -6,7 +6,7 @@
  */
 
 
-#include "rtos.h"
+#include "rtos_mutex.h"
 
 /*
  * This function initializes the mutex
@@ -16,8 +16,9 @@
  * Return:
  * 	None
  */
-void RTOS_mutexInit(RTOS_mutex_t* pMutex, int32_t value)
+void RTOS_mutexInit(RTOS_mutex_t* pMutex, uint32_t value)
 {
+	ASSERT(pMutex != NULL);
 	ASSERT((value == RTOS_MUTEX_USED) || (value == RTOS_MUTEX_FREE));
 	/* Initialize the mutex list */
 	RTOS_listInit(&pMutex->mutexList);
@@ -30,61 +31,88 @@ void RTOS_mutexInit(RTOS_mutex_t* pMutex, int32_t value)
  * This function locks the mutex
  * Inputs:
  *  pMutex -> Pointer to the mutex
+ *  waitTicks -> Number of systicks to wait before retrying
  * Return:
- * 	None
+ * 	States whether the mutex was acquired successfully or not
  */
 
-void RTOS_mutexLock(RTOS_mutex_t* pMutex)
+RTOS_returnStatus RTOS_mutexLock(RTOS_mutex_t* pMutex, uint32_t waitTicks)
 {
-	uint8_t success = 0;
-	while(1)
+	uint8_t terminate = 0;
+	uint32_t value;
+	RTOS_returnStatus returnStatus = RTOS_FAIL;
+
+	/* Keep trying */
+	while(!terminate)
 	{
-		/* Read the mutex value */
-		/* If the mutex is free */
-		if((int32_t)__LDREXW((uint32_t*) &pMutex->value) == RTOS_MUTEX_FREE)
+		/* Load the mutex value */
+		value = __LDREXW(&pMutex->value);
+		/* Check if the mutex can be acquired */
+		if(value == RTOS_MUTEX_FREE)
 		{
-			/* Set the mutex as used, If we failed to set the mutex value then just keep trying */
-			if(__STREXW(RTOS_MUTEX_USED, (uint32_t*) &pMutex->value) == 0)
+			/* Attempt to store the mutex */
+			if( __STREXW(RTOS_MUTEX_USED, &pMutex->value) == 0)
 			{
-				success = 1;
 				/* Data Memory Barrier */
 				__DMB();
-				break;
+				/* Set the mutex as acquired */
+				returnStatus = RTOS_SUCCESS;
+				/* End loop */
+				terminate = 1;
 			}
 			else
 			{
 
 			}
 		}
-		/* If the mutex is used then we failed to acquire the mutex */
 		else
 		{
-			break;
+			/* End loop */
+			terminate = 1;
 		}
 	}
 
-	/* In case of failure to acquire the mutex */
-	if(success != 1)
+
+	/* If the mutex was not acquired successfully */
+	if(returnStatus != RTOS_SUCCESS)
 	{
-		/* Block this process */
-		RTOS_listItem_t* pRunningItem = &(RTOS_threadGetRunning()->listItem);
+		if(waitTicks > 0)
+		{
+			/* Get the currently running thread */
+			RTOS_thread_t* pThread = RTOS_threadGetRunning();
+			/* Remove the thread from the ready list */
+			RTOS_listRemove(& pThread->listItem);
+			/* Set the items ordering value for the mutex list */
+			pThread->eventListItem.orderValue = pThread->priority;
+			/* Add the thread to the mutex list */
+			RTOS_listInsert(&pMutex->mutexList, & pThread->eventListItem);
 
-		/* Set the items' ordering value */
-		pRunningItem->orderValue = ((RTOS_thread_t*)pRunningItem->pThread)->priority;
+			if(waitTicks == RTOS_WAITFOREVER)
+			{
+				/* The user wants to wait forever so we set the return status as success */
+				returnStatus = RTOS_SUCCESS;
+			}
+			/* Add the thread to timer's list */
+			else
+			{
+				RTOS_threadAddToTimerList(pThread, waitTicks);
+				returnStatus = RTOS_DELAY;
+			}
+			/* Invoke a pendSV exception */
+			SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+		}
 
-		/* Remove the thread from the ready list */
-		RTOS_listRemove(pRunningItem);
+		else
+		{
 
-		/* Add the thread to the semaphores' list */
-		RTOS_listInsert(&pMutex->mutexList, pRunningItem);
-
-		/* Invoke a pendSV exception */
-		SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+		}
 	}
 	else
 	{
 
 	}
+
+	return returnStatus;
 }
 
 
@@ -101,13 +129,24 @@ void RTOS_mutexUnlock(RTOS_mutex_t* pMutex)
 	__DMB();
 	/* Unlock the mutex */
 	pMutex->value = RTOS_MUTEX_FREE;
+	/* Check if any threads are blocked */
 	if(pMutex->mutexList.numListItems > 0)
 	{
-		/* Remove a process from the list */
-		RTOS_listItem_t* pRemovedItem = pMutex->mutexList.endItem.pPrev;
-		RTOS_listRemove(pRemovedItem);
+		/* Remove a thread from the mutex list */
+		RTOS_thread_t* pThread = pMutex->mutexList.endItem.pPrev->pThread;
+		RTOS_listRemove(& pThread->eventListItem);
+		/* Check if the thread was delayed then remove it from delay list */
+		if(pThread->listItem.pList != NULL)
+		{
+			RTOS_listRemove(& pThread->listItem);
+		}
+		else
+		{
+
+		}
 		/* Place this thread in the ready list */
-		RTOS_threadAddToReadyList(pRemovedItem->pThread);
+		RTOS_threadAddToReadyList(pThread);
+
 	}
 	else
 	{

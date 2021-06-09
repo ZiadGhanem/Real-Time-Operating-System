@@ -5,7 +5,7 @@
  *      Author: ziadyasser
  */
 
-#include "rtos.h"
+#include "rtos_semaphore.h"
 
 /*
  * This function initializes the semaphore
@@ -15,9 +15,9 @@
  * Return:
  * 	None
  */
-void RTOS_semaphoreInit(RTOS_semaphore_t* pSemaphore, int32_t value)
+void RTOS_semaphoreInit(RTOS_semaphore_t* pSemaphore, uint32_t value)
 {
-	ASSERT(value >= 0);
+	ASSERT(pSemaphore != 0);
 	/* Initialize the semaphores list */
 	RTOS_listInit(&pSemaphore->semaphoreList);
 	/* Set the semaphores' value */
@@ -29,47 +29,88 @@ void RTOS_semaphoreInit(RTOS_semaphore_t* pSemaphore, int32_t value)
  * This function waits for the semaphore
  * Inputs:
  *  pSemaphore -> Pointer to the semaphore
+ *  waitTicks -> Number of systicks to wait before retrying
  * Return:
- * 	None
+ * 	States whether the semaphore was acquired successfully or not
  */
 
-void RTOS_semaphoreWait(RTOS_semaphore_t* pSemaphore)
+RTOS_returnStatus RTOS_semaphoreWait(RTOS_semaphore_t* pSemaphore, uint32_t waitTicks)
 {
-	/* Keep trying to acquire the semaphore */
-	int32_t value;
-	do
+	uint8_t terminate = 0;
+	uint32_t value;
+	RTOS_returnStatus returnStatus = RTOS_FAIL;
+
+	/* Keep trying*/
+	while(!terminate)
 	{
 		/* Load the semaphore value */
-		value = (int32_t)__LDREXW((uint32_t*) &pSemaphore->value);
-		/* Decrement the semaphore value */
-		value--;
+		value = __LDREXW(&pSemaphore->value);
+		/* Check if the semaphore can be acquired */
+		if(value > 0)
+		{
+			/* Decrement the semaphore value and attempt to store the semaphore */
+			if( __STREXW(value - 1, &pSemaphore->value) == 0)
+			{
+				/* Data Memory Barrier */
+				__DMB();
+				/* Set the semaphore as acquired */
+				returnStatus = RTOS_SUCCESS;
+				/* End loop */
+				terminate = 1;
+			}
+			else
+			{
+
+			}
+		}
+		else
+		{
+			/* End loop */
+			terminate = 1;
+		}
 	}
-	while( __STREXW(value,(uint32_t*) &pSemaphore->value) == 1);
 
-	/* Data Memory Barrier */
-	__DMB();
 
-	if(value < 0)
+	/* If the semaphore was not acquired successfully */
+	if(returnStatus != RTOS_SUCCESS)
 	{
-		/* Block this process */
-		RTOS_listItem_t* pRunningItem = &(RTOS_threadGetRunning()->listItem);
+		if(waitTicks > 0)
+		{
+			/* Get the currently running thread */
+			RTOS_thread_t* pThread = RTOS_threadGetRunning();
+			/* Remove the thread from the ready list */
+			RTOS_listRemove(& pThread->listItem);
+			/* Set the items ordering value for the semaphores list */
+			pThread->eventListItem.orderValue = pThread->priority;
+			/* Add the thread to the semaphores list */
+			RTOS_listInsert(&pSemaphore->semaphoreList, & pThread->eventListItem);
 
-		/* Set the items' ordering value */
-		pRunningItem->orderValue = ((RTOS_thread_t*)pRunningItem->pThread)->priority;
+			if(waitTicks == RTOS_WAITFOREVER)
+			{
+				/* The user wants to wait forever so we set the return status as success */
+				returnStatus = RTOS_SUCCESS;
+			}
+			/* Add the thread to timer's list */
+			else
+			{
+				RTOS_threadAddToTimerList(pThread, waitTicks);
+				returnStatus = RTOS_DELAY;
+			}
+			/* Invoke a pendSV exception */
+			SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+		}
 
-		/* Remove the thread from the ready list */
-		RTOS_listRemove(pRunningItem);
+		else
+		{
 
-		/* Add the thread to the semaphores' list */
-		RTOS_listInsert(&pSemaphore->semaphoreList, pRunningItem);
-
-		/* Invoke a pendSV exception */
-		SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
+		}
 	}
 	else
 	{
 
 	}
+
+	return returnStatus;
 }
 
 
@@ -83,26 +124,36 @@ void RTOS_semaphoreWait(RTOS_semaphore_t* pSemaphore)
 void RTOS_semaphoreSignal(RTOS_semaphore_t* pSemaphore)
 {
 	/* Keep trying to acquire the semaphore */
-	int32_t value;
+	uint32_t value;
 	do
 	{
 		/* Load the semaphore value */
-		value = (int32_t)__LDREXW((uint32_t*) &pSemaphore->value);
+		value = __LDREXW(&pSemaphore->value);
 		/* Increment the semaphore value */
 		value++;
 	}
-	while( __STREXW(value,(uint32_t*) &pSemaphore->value) == 1);
+	while( __STREXW(value, &pSemaphore->value) == 1);
 
 	/* Data Memory Barrier */
 	__DMB();
 
-	if(value <= 0)
+	/* Check if any threads are blocked */
+	if(pSemaphore->semaphoreList.numListItems > 0)
 	{
-		/* Remove a process from the list */
-		RTOS_listItem_t* pRemovedItem = pSemaphore->semaphoreList.endItem.pPrev;
-		RTOS_listRemove(pRemovedItem);
+		/* Remove a thread from the semaphore list */
+		RTOS_thread_t* pThread = pSemaphore->semaphoreList.endItem.pPrev->pThread;
+		RTOS_listRemove(& pThread->eventListItem);
+		/* Check if the thread was delayed then remove it from delay list */
+		if(pThread->listItem.pList != NULL)
+		{
+			RTOS_listRemove(& pThread->listItem);
+		}
+		else
+		{
+
+		}
 		/* Place this thread in the ready list */
-		RTOS_threadAddToReadyList(pRemovedItem->pThread);
+		RTOS_threadAddToReadyList(pThread);
 	}
 	else
 	{

@@ -8,15 +8,11 @@
 #ifndef RTOS_INC_RTOS_H_
 #define RTOS_INC_RTOS_H_
 
+#include <stdint.h>
+#include <stddef.h>
+#include <string.h>
 #include "stm32f4xx.h"
 #include "rtos_conf.h"
-#include "rtos_list.h"
-#include "rtos_thread.h"
-#include "rtos_scheduler.h"
-#include "rtos_semaphore.h"
-#include "rtos_mutex.h"
-#include "rtos_spinlock.h"
-#include "rtos_mailbox.h"
 
 #define MEM32WORD(ADDRESS) (*((volatile uint32_t *)(ADDRESS)))
 
@@ -27,8 +23,11 @@
 		while(1);	\
 	}
 
-#define FAILURE 0
-#define SUCCESS 1
+typedef enum{
+	RTOS_FAIL,
+	RTOS_DELAY,
+	RTOS_SUCCESS
+}RTOS_returnStatus;
 
 void RTOS_init(void);
 void RTOS_SVC_Handler_Main(uint32_t* svc_args);

@@ -5,7 +5,7 @@
  *      Author: ziadyasser
  */
 
-#include "rtos.h"
+#include "rtos_scheduler.h"
 
 
 volatile uint32_t RTOS_systickCount;

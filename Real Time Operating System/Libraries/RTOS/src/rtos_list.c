@@ -5,7 +5,7 @@
  *      Author: ziadyasser
  */
 
-#include "rtos.h"
+#include "rtos_list.h"
 
 /*
  * This function initializes the list

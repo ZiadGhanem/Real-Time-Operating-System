@@ -5,7 +5,7 @@
  *      Author: ziadyasser
  */
 
-#include "rtos.h"
+#include "rtos_thread.h"
 
 /* Current top thread priority */
 static uint32_t currentTopPriority = MAX_PRIORITY_LEVEL - 1;
@@ -105,6 +105,11 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, void* pFunc
 
 	/* Set the thread's list item thread pointer */
 	pThread->listItem.pThread = pThread;
+	pThread->eventListItem.pThread = pThread;
+
+	/* Set the thread's list item to none */
+	pThread->listItem.pList = NULL;
+	pThread->eventListItem.pList = NULL;
 
 	/* Add the thread to the ready list */
 	RTOS_listInsertEnd(&RTOS_readyList[priority], &pThread->listItem);
@@ -150,7 +155,7 @@ RTOS_thread_t* RTOS_threadGetRunning(void)
  * Inputs:
  *  pThread -> The thread to be inserted in the ready list
  * Return:
- * 	Pointer to the the list
+ * 	None
  */
 void RTOS_threadAddToReadyList(RTOS_thread_t* pThread)
 {
@@ -179,6 +184,29 @@ void RTOS_threadAddToReadyList(RTOS_thread_t* pThread)
 	else
 	{
 	}
+}
+
+/*
+ * This function adds the thread to the timer's list
+ * Inputs:
+ *  pThread -> The thread to be inserted in the ready list
+ *  waitTicks -> Number of systicks to be delayed
+ * Return:
+ * 	None
+ */
+void RTOS_threadAddToTimerList(RTOS_thread_t* pThread, uint32_t waitTicks)
+{
+	/* Get the list item */
+	RTOS_listItem_t* pListItem = & pThread->listItem;
+
+	/* Set the delay amount */
+	pListItem->orderValue = RTOS_schedulerGetSystickCount() + waitTicks;
+
+	/* Add the thread to the delayed list */
+	RTOS_listInsert(&RTOS_delayList, pListItem);
+
+	/* Set the thread state to blocked */
+	pRunningThread->threadState = RTOS_THREADBLOCKED;
 }
 
 
@@ -217,27 +245,22 @@ void RTOS_threadSwitch(void)
 	pThread->threadState = RTOS_THREADRUNNING;
 }
 
+
 /*
  * This function delays the currently running thread
  * Inputs:
- *  systicks -> Number of system ticks to be delayed
+ *  waitTicks -> Number of system ticks to be delayed
  * Return:
  * 	None
  */
-void RTOS_threadDelay(uint32_t systicks)
+void RTOS_threadDelay(uint32_t waitTicks)
 {
 	/* Remove the current thread from ready list */
 	RTOS_listItem_t* pListItem = & pRunningThread->listItem;
 	RTOS_listRemove(pListItem);
 
-	/* Set the delay amount */
-	pListItem->orderValue = RTOS_schedulerGetSystickCount() + systicks;
-
-	/* Add the thread to the delayed list */
-	RTOS_listInsert(&RTOS_delayList, pListItem);
-
-	/* Set the thread state to blocked */
-	pRunningThread->threadState = RTOS_THREADBLOCKED;
+	/* Add the thread to timer list */
+	RTOS_threadAddToTimerList(pListItem->pThread, waitTicks);
 
 	/* Invoke a pendSV exception */
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;

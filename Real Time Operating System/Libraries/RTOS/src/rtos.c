@@ -6,6 +6,13 @@
  */
 
 #include "rtos.h"
+#include "rtos_list.h"
+#include "rtos_thread.h"
+#include "rtos_scheduler.h"
+#include "rtos_semaphore.h"
+#include "rtos_mutex.h"
+#include "rtos_spinlock.h"
+#include "rtos_mailbox.h"
 
 /*
  * This Function initializes the RTOS
@@ -69,6 +76,7 @@ void RTOS_SVC_Handler_Main(uint32_t* svc_args)
 	 */
 	uint32_t svc_number;
 	svc_number = ((int8_t*)svc_args[6])[-2];
+	RTOS_returnStatus returnStatus;
 
 	switch(svc_number)
 	{
@@ -96,7 +104,7 @@ void RTOS_SVC_Handler_Main(uint32_t* svc_args)
 			RTOS_semaphoreInit((RTOS_semaphore_t*) svc_args[0], (int32_t)svc_args[1]);
 			break;
 		case 5:
-			RTOS_semaphoreWait((RTOS_semaphore_t*) svc_args[0]);
+			returnStatus = RTOS_semaphoreWait((RTOS_semaphore_t*) svc_args[0], (uint32_t) svc_args[1]);
 			break;
 		case 6:
 			RTOS_semaphoreSignal((RTOS_semaphore_t*) svc_args[0]);
@@ -106,7 +114,7 @@ void RTOS_SVC_Handler_Main(uint32_t* svc_args)
 			RTOS_mutexInit((RTOS_mutex_t*) svc_args[0], (int32_t)svc_args[1]);
 			break;
 		case 8:
-			RTOS_mutexLock((RTOS_mutex_t*) svc_args[0]);
+			returnStatus = RTOS_mutexLock((RTOS_mutex_t*) svc_args[0], (uint32_t) svc_args[1]);
 			break;
 		case 9:
 			RTOS_mutexUnlock((RTOS_mutex_t*) svc_args[0]);
@@ -116,24 +124,75 @@ void RTOS_SVC_Handler_Main(uint32_t* svc_args)
 			RTOS_spinInit((RTOS_spinLock_t*) svc_args[0], (int32_t)svc_args[1]);
 			break;
 		case 11:
-			RTOS_spinLock((RTOS_spinLock_t*) svc_args[0]);
+			returnStatus = RTOS_spinLock((RTOS_spinLock_t*) svc_args[0]);
 			break;
 		case 12:
 			RTOS_spinUnlock((RTOS_spinLock_t*) svc_args[0]);
 			break;
-		case 13:
 		/* MailBox */
+		case 13:
 			RTOS_mailBoxInit((RTOS_mailBox_t*) svc_args[0], (void*) svc_args[1], (uint32_t) svc_args[2], (uint32_t) svc_args[3]);
 			break;
 		case 14:
-			RTOS_mailBoxSend((RTOS_mailBox_t*) svc_args[0], (void*) svc_args[1]);
+			returnStatus = RTOS_mailBoxSend((RTOS_mailBox_t*) svc_args[0], (void*) svc_args[1], (uint32_t) svc_args[2]);
 			break;
 		case 15:
-			RTOS_mailBoxReceive((RTOS_mailBox_t*)  svc_args[0], (void*) svc_args[1]);
+			returnStatus = RTOS_mailBoxReceive((RTOS_mailBox_t*)  svc_args[0], (void*) svc_args[1], (uint32_t) svc_args[2]);
 			break;
 		/* Unsupported supervisor call */
 		default:
 			ASSERT(0)
+			break;
+	}
+
+	switch(svc_number)
+	{
+		/* For semaphores, mutex*/
+		case 5:
+		case 8:
+			/* If we failed to acquire the synchronization tool */
+			if(returnStatus == RTOS_DELAY)
+			{
+				 /* Attempt to acquire it the next time by decrementing the PC */
+				svc_args[6] -= 2;
+				/* Do not wait the next time */
+				svc_args[1] = 0;
+			}
+			else
+			{
+				svc_args[0] = returnStatus;
+			}
+			break;
+
+		/* For spinlocks */
+		case 11:
+			if(returnStatus == RTOS_DELAY)
+			{
+				 /* Attempt to acquire it again next time by decrementing the PC */
+				svc_args[6] -= 2;
+			}
+			else
+			{
+				svc_args[0] = returnStatus;
+			}
+			break;
+
+		/* For mailbox */
+		case 14:
+		case 15:
+			/* If we failed to use the mailbox */
+			if(returnStatus == RTOS_DELAY)
+			{
+				 /* Attempt to use it the next time by decrementing the PC */
+				svc_args[6] -= 2;
+				/* Do not wait the next time */
+				svc_args[2] = 0;
+			}
+			else
+			{
+				svc_args[0] = returnStatus;
+			}
+			break;
 			break;
 	}
 }
