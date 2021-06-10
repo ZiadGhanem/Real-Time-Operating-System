@@ -10,17 +10,17 @@
 
 volatile uint32_t RTOS_systickCount;
 volatile uint32_t RTOS_SVC_excReturn;
-static RTOS_thread_t RTOS_idleThread;
-static RTOS_stack_t RTOS_idleThreadStack[IDLE_THREAD_STACK_SIZE];
+static RTOS_task_t RTOS_idleTask;
+static RTOS_stack_t RTOS_idleTaskStack[IDLE_TASK_STACK_SIZE];
 
 /*
- * This is the idle thread function
+ * This is the idle task function
  * Inputs:
  * 	None
  * Return:
  * 	None
  */
-static void RTOS_idleThreadFunc(void)
+static void RTOS_idleTaskFunc(void)
 {
 	while(1);
 }
@@ -34,23 +34,23 @@ static void RTOS_idleThreadFunc(void)
  */
 void RTOS_schedulerStart(void)
 {
-	/* Create the idle thread */
-	RTOS_threadCreate(&RTOS_idleThread, RTOS_idleThreadStack, IDLE_THREAD_STACK_SIZE, RTOS_idleThreadFunc, MAX_PRIORITY_LEVEL - 1);
+	/* Create the idle task */
+	RTOS_taskCreate(&RTOS_idleTask, RTOS_idleTaskStack, IDLE_TASK_STACK_SIZE, RTOS_idleTaskFunc, MAX_PRIORITY_LEVEL - 1);
 
-	/* Switch to the top priority ready thread */
-	RTOS_threadSwitch();
+	/* Switch to the top priority ready task */
+	RTOS_taskSwitch();
 
-	/* Get the new ready thread */
-	RTOS_thread_t* pNewRunningThread = RTOS_threadGetRunning();
+	/* Get the new ready task */
+	RTOS_task_t* pNewRunningTask = RTOS_taskGetRunning();
 
 	/* Set the exception return value */
-	RTOS_SVC_excReturn = MEM32WORD(pNewRunningThread->pStack);
+	RTOS_SVC_excReturn = MEM32WORD(pNewRunningTask->pStack);
 
 	/* Set the Process Stack Pointer */
-	__set_PSP(pNewRunningThread->pStack + 10 * 4);
+	__set_PSP(pNewRunningTask->pStack + 10 * 4);
 
 	/* Set the control register */
-	__set_CONTROL(MEM32WORD(pNewRunningThread->pStack + (1 << 2)));
+	__set_CONTROL(MEM32WORD(pNewRunningTask->pStack + (1 << 2)));
 
 	/* We don't need to pop any registers as the function has not been ran before */
 
@@ -76,8 +76,8 @@ void RTOS_schedulerStart(void)
  */
 void RTOS_SysTick_Handler(void)
 {
- 	/* Check for delayed threads to be unblocked */
- 	RTOS_threadDelayCheck();
+ 	/* Check for delayed tasks to be unblocked */
+ 	RTOS_taskDelayCheck();
 
 	/* Invoke a pendSV exception */
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;

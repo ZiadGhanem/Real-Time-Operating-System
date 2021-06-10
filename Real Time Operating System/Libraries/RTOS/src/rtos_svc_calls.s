@@ -10,9 +10,9 @@
  .thumb
 
  .global RTOS_SVC_schedulerStart
- .global RTOS_SVC_threadCreate
- .global RTOS_SVC_threadDelay
- .global RTOS_SVC_threadTerminate
+ .global RTOS_SVC_taskCreate
+ .global RTOS_SVC_taskDelay
+ .global RTOS_SVC_taskTerminate
  .global RTOS_SVC_semaphoreInit
  .global RTOS_SVC_semaphoreWait
  .global RTOS_SVC_semaphoreSignal
@@ -34,18 +34,18 @@
 	SVC 0
 	BX LR
 
- .type RTOS_SVC_threadCreate, %function
- RTOS_SVC_threadCreate:
+ .type RTOS_SVC_taskCreate, %function
+ RTOS_SVC_taskCreate:
 	SVC 1
 	BX LR
 
- .type RTOS_SVC_threadDelay, %function
- RTOS_SVC_threadDelay:
+ .type RTOS_SVC_taskDelay, %function
+ RTOS_SVC_taskDelay:
  	SVC 2
  	BX LR
 
- .type RTOS_SVC_threadTerminate, %function
- RTOS_SVC_threadTerminate:
+ .type RTOS_SVC_taskTerminate, %function
+ RTOS_SVC_taskTerminate:
  	SVC 3
  	BX LR
 

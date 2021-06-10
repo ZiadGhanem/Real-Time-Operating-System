@@ -28,15 +28,15 @@ SOFTWARE.
 */
 
 /* Includes */
+#include <rtos_task.h>
 #include "stm32f4xx.h"
-#include "rtos_thread.h"
 #include "rtos_scheduler.h"
 #include "rtos_mailbox.h"
 
 #define GREEN_LED 13
 #define RED_LED 14
 
-RTOS_thread_t thread[2];
+RTOS_task_t task[2];
 RTOS_stack_t stack[2][512];
 RTOS_mailBox_t mailbox;
 uint8_t buffer[10];
@@ -74,7 +74,7 @@ void func_2(void)
 		{
 			GPIO_SetBits(GPIOG, (1 << RED_LED));
 		}
-		RTOS_SVC_threadDelay(1000);
+		RTOS_SVC_taskDelay(1000);
 	}
 }
 
@@ -96,8 +96,8 @@ int main(void)
 
 	RTOS_init();
 
-	RTOS_SVC_threadCreate(&thread[0], stack[0], 512, func_1, 1);
-	RTOS_SVC_threadCreate(&thread[1], stack[1], 512, func_2, 1);
+	RTOS_SVC_taskCreate(&task[0], stack[0], 512, func_1, 1);
+	RTOS_SVC_taskCreate(&task[1], stack[1], 512, func_2, 1);
 
 	RTOS_SVC_mailBoxInit(&mailbox, &buffer, 10, 1);
 	RTOS_SVC_schedulerStart();

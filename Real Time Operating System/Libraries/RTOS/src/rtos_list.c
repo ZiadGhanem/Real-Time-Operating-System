@@ -77,9 +77,9 @@ void RTOS_listInsert(RTOS_list_t* pList, RTOS_listItem_t* pListItem)
 	/* Find the location of the highest priority in the list,
 	 * Lazy evaluation prevents the second condition from being
 	 * tested in case the next item was the end item as it doesn't
-	 * have pThread
+	 * have pTask
 	 */
-	 /* Not less than or equal so the thread waiting the most gets executed first */
+	 /* Not less than or equal so the task waiting the most gets executed first */
 	while((pCurrentItem->pNext != (RTOS_listItem_t*) &pList->endItem) &&
 	(pListItem->orderValue < pCurrentItem->pNext->orderValue))
 	{

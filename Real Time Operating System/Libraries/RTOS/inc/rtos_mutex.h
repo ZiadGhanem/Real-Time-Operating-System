@@ -8,8 +8,8 @@
 #ifndef RTOS_INC_RTOS_MUTEX_H_
 #define RTOS_INC_RTOS_MUTEX_H_
 
+#include <rtos_task.h>
 #include "rtos.h"
-#include "rtos_thread.h"
 
 #define RTOS_MUTEX_USED (uint32_t)0
 #define RTOS_MUTEX_FREE (uint32_t)1

@@ -76,19 +76,19 @@ RTOS_returnStatus RTOS_mutexLock(RTOS_mutex_t* pMutex, uint32_t waitTicks)
 	/* If the mutex was not acquired successfully */
 	if(returnStatus == RTOS_FAIL && waitTicks > 0)
 	{
-		/* Get the currently running thread */
-		RTOS_thread_t* pThread = RTOS_threadGetRunning();
-		/* Remove the thread from the ready list */
-		RTOS_listRemove(& pThread->listItem);
+		/* Get the currently running task */
+		RTOS_task_t* pTask = RTOS_taskGetRunning();
+		/* Remove the task from the ready list */
+		RTOS_listRemove(& pTask->listItem);
 		/* Set the items ordering value for the mutex list */
-		pThread->eventListItem.orderValue = pThread->priority;
-		/* Add the thread to the mutex list */
-		RTOS_listInsert(&pMutex->mutexList, & pThread->eventListItem);
+		pTask->eventListItem.orderValue = pTask->priority;
+		/* Add the task to the mutex list */
+		RTOS_listInsert(&pMutex->mutexList, & pTask->eventListItem);
 
 		if(waitTicks != RTOS_WAITFOREVER)
 		{
-			/* Add the thread to timer's list */
-			RTOS_threadAddToTimerList(pThread, waitTicks);
+			/* Add the task to timer's list */
+			RTOS_taskAddToTimerList(pTask, waitTicks);
 		}
 		else
 		{
@@ -120,23 +120,23 @@ void RTOS_mutexUnlock(RTOS_mutex_t* pMutex)
 	__DMB();
 	/* Unlock the mutex */
 	pMutex->value = RTOS_MUTEX_FREE;
-	/* Check if any threads are blocked */
+	/* Check if any tasks are blocked */
 	if(pMutex->mutexList.numListItems > 0)
 	{
-		/* Remove a thread from the mutex list */
-		RTOS_thread_t* pThread = pMutex->mutexList.endItem.pPrev->pThread;
-		RTOS_listRemove(& pThread->eventListItem);
-		/* Check if the thread was delayed then remove it from delay list */
-		if(pThread->listItem.pList != NULL)
+		/* Remove a task from the mutex list */
+		RTOS_task_t* pTask = pMutex->mutexList.endItem.pPrev->pTask;
+		RTOS_listRemove(& pTask->eventListItem);
+		/* Check if the task was delayed then remove it from delay list */
+		if(pTask->listItem.pList != NULL)
 		{
-			RTOS_listRemove(& pThread->listItem);
+			RTOS_listRemove(& pTask->listItem);
 		}
 		else
 		{
 
 		}
-		/* Place this thread in the ready list */
-		RTOS_threadAddToReadyList(pThread);
+		/* Place this task in the ready list */
+		RTOS_taskAddToReadyList(pTask);
 
 	}
 	else

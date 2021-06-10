@@ -31,10 +31,10 @@
 
  .type RTOS_PendSV_Handler, %function
  RTOS_PendSV_Handler:
- 	/****************** Saving the current thread's context ********************/
+ 	/****************** Saving the current task's context ********************/
  	/* Get PSP */
  	MRS R1, PSP
-	/* Check if the currently running thread uses FPU
+	/* Check if the currently running task uses FPU
 	 * If so so push FPU registers (s16 - s32)
 	**/
 	TST LR, 0x10	/* Test bit 5 in LR, if it is zero then FPU is enabled */
@@ -46,27 +46,27 @@
 	MRS R3, CONTROL
 	/* Instruction Synchronization Barrier */
 	ISB
-	/* Push {R2 -> R11} into the thread's stack*/
+	/* Push {R2 -> R11} into the task's stack*/
 	STMDB R1!, {R2-R11}
-	/* Save the thread's stack pointer */
-	BL RTOS_threadGetRunning
+	/* Save the task's stack pointer */
+	BL RTOS_taskGetRunning
 	STR R1, [R0]
 
-	/****************** Switch threads ********************/
+	/****************** Switch tasks ********************/
 	/* Disable all interrupts excepts SVC as PendSV can be interrupted */
 	MOV R0, #1
 	MSR BASEPRI, R1
- 	/* Get the next thread */
- 	BL RTOS_threadSwitch
+ 	/* Get the next task */
+ 	BL RTOS_taskSwitch
  	/* Enable all interrupts */
 	MOV R0, #0
 	MSR BASEPRI, R0
- 	/* Set the process stack pointer to the thread's stack */
- 	BL RTOS_threadGetRunning
+ 	/* Set the process stack pointer to the task's stack */
+ 	BL RTOS_taskGetRunning
 
-	/****************** Restoring the next thread's context ********************/
+	/****************** Restoring the next task's context ********************/
  	LDR R1, [R0]
- 	/* POP {R2 -> R11} from the thread's stack*/
+ 	/* POP {R2 -> R11} from the task's stack*/
  	LDMIA R1!, {R2-R11}
  	/* Move R3 into CONTROL */
  	MSR CONTROL, R3
@@ -74,7 +74,7 @@
  	ISB
  	/* MOVE R2 into Link Register */
  	MOV LR, R2
- 	/* Check if the currently running thread uses FPU
+ 	/* Check if the currently running task uses FPU
 	 * If so so pop FPU registers (s16 - s32)
 	**/
 	TST LR, 0x10	/* Test bit 5 in LR, if it is zero then FPU is enabled */

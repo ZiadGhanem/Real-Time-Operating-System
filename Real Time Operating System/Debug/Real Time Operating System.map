@@ -10,10 +10,10 @@ Common symbol       size              file
 
 mailbox             0x50              src/main.o
 RTOS_systickCount   0x4               Libraries/RTOS/src/rtos_scheduler.o
-thread              0x70              src/main.o
 stack               0x2000            src/main.o
 RTOS_SVC_excReturn  0x4               Libraries/RTOS/src/rtos_scheduler.o
 buffer              0xa               src/main.o
+task                0x70              src/main.o
 
 Discarded input sections
 
@@ -24,6 +24,26 @@ Discarded input sections
  .text          0x0000000000000000        0x0 Libraries/RTOS/src/rtos.o
  .data          0x0000000000000000        0x0 Libraries/RTOS/src/rtos.o
  .bss           0x0000000000000000        0x0 Libraries/RTOS/src/rtos.o
+ .text          0x0000000000000000        0x0 Libraries/RTOS/src/rtos_bsemaphore.o
+ .data          0x0000000000000000        0x0 Libraries/RTOS/src/rtos_bsemaphore.o
+ .bss           0x0000000000000000        0x0 Libraries/RTOS/src/rtos_bsemaphore.o
+ .text.RTOS_bSemaphoreInit
+                0x0000000000000000       0x3a Libraries/RTOS/src/rtos_bsemaphore.o
+ .text.RTOS_bSemaphoreWait
+                0x0000000000000000       0xd0 Libraries/RTOS/src/rtos_bsemaphore.o
+ .text.RTOS_bSemaphoreSignal
+                0x0000000000000000       0x4c Libraries/RTOS/src/rtos_bsemaphore.o
+ .debug_info    0x0000000000000000      0xe4b Libraries/RTOS/src/rtos_bsemaphore.o
+ .debug_abbrev  0x0000000000000000      0x25b Libraries/RTOS/src/rtos_bsemaphore.o
+ .debug_aranges
+                0x0000000000000000       0x30 Libraries/RTOS/src/rtos_bsemaphore.o
+ .debug_ranges  0x0000000000000000       0x20 Libraries/RTOS/src/rtos_bsemaphore.o
+ .debug_line    0x0000000000000000      0x33d Libraries/RTOS/src/rtos_bsemaphore.o
+ .debug_str     0x0000000000000000      0x8d4 Libraries/RTOS/src/rtos_bsemaphore.o
+ .comment       0x0000000000000000       0x7d Libraries/RTOS/src/rtos_bsemaphore.o
+ .debug_frame   0x0000000000000000       0x7c Libraries/RTOS/src/rtos_bsemaphore.o
+ .ARM.attributes
+                0x0000000000000000       0x39 Libraries/RTOS/src/rtos_bsemaphore.o
  .data          0x0000000000000000        0x0 Libraries/RTOS/src/rtos_handlers.o
  .bss           0x0000000000000000        0x0 Libraries/RTOS/src/rtos_handlers.o
  .text          0x0000000000000000        0x0 Libraries/RTOS/src/rtos_list.o
@@ -46,9 +66,9 @@ Discarded input sections
  .bss           0x0000000000000000        0x0 Libraries/RTOS/src/rtos_spinlock.o
  .data          0x0000000000000000        0x0 Libraries/RTOS/src/rtos_svc_calls.o
  .bss           0x0000000000000000        0x0 Libraries/RTOS/src/rtos_svc_calls.o
- .text          0x0000000000000000        0x0 Libraries/RTOS/src/rtos_thread.o
- .data          0x0000000000000000        0x0 Libraries/RTOS/src/rtos_thread.o
- .bss           0x0000000000000000        0x0 Libraries/RTOS/src/rtos_thread.o
+ .text          0x0000000000000000        0x0 Libraries/RTOS/src/rtos_task.o
+ .data          0x0000000000000000        0x0 Libraries/RTOS/src/rtos_task.o
+ .bss           0x0000000000000000        0x0 Libraries/RTOS/src/rtos_task.o
  .text          0x0000000000000000        0x0 Libraries/STM32F4xx_StdPeriph_Driver/src/misc.o
  .data          0x0000000000000000        0x0 Libraries/STM32F4xx_StdPeriph_Driver/src/misc.o
  .bss           0x0000000000000000        0x0 Libraries/STM32F4xx_StdPeriph_Driver/src/misc.o
@@ -1944,6 +1964,7 @@ Linker script and memory map
 LOAD /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crti.o
 LOAD /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtbegin.o
 LOAD Libraries/RTOS/src/rtos.o
+LOAD Libraries/RTOS/src/rtos_bsemaphore.o
 LOAD Libraries/RTOS/src/rtos_handlers.o
 LOAD Libraries/RTOS/src/rtos_list.o
 LOAD Libraries/RTOS/src/rtos_mailbox.o
@@ -1952,7 +1973,7 @@ LOAD Libraries/RTOS/src/rtos_scheduler.o
 LOAD Libraries/RTOS/src/rtos_semaphore.o
 LOAD Libraries/RTOS/src/rtos_spinlock.o
 LOAD Libraries/RTOS/src/rtos_svc_calls.o
-LOAD Libraries/RTOS/src/rtos_thread.o
+LOAD Libraries/RTOS/src/rtos_task.o
 LOAD Libraries/STM32F4xx_StdPeriph_Driver/src/misc.o
 LOAD Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_adc.o
 LOAD Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_can.o
@@ -2032,9 +2053,9 @@ LOAD /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-
                 0x000000000800020c                RTOS_PendSV_Handler
  .text          0x000000000800026c       0x40 Libraries/RTOS/src/rtos_svc_calls.o
                 0x000000000800026c                RTOS_SVC_schedulerStart
-                0x0000000008000270                RTOS_SVC_threadCreate
-                0x0000000008000274                RTOS_SVC_threadDelay
-                0x0000000008000278                RTOS_SVC_threadTerminate
+                0x0000000008000270                RTOS_SVC_taskCreate
+                0x0000000008000274                RTOS_SVC_taskDelay
+                0x0000000008000278                RTOS_SVC_taskTerminate
                 0x000000000800027c                RTOS_SVC_semaphoreInit
                 0x0000000008000280                RTOS_SVC_semaphoreWait
                 0x0000000008000284                RTOS_SVC_semaphoreSignal
@@ -2093,7 +2114,7 @@ LOAD /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-
  .text.RTOS_mutexUnlock
                 0x0000000008000acc       0x4c Libraries/RTOS/src/rtos_mutex.o
                 0x0000000008000acc                RTOS_mutexUnlock
- .text.RTOS_idleThreadFunc
+ .text.RTOS_idleTaskFunc
                 0x0000000008000b18        0x6 Libraries/RTOS/src/rtos_scheduler.o
  *fill*         0x0000000008000b1e        0x2 
  .text.RTOS_schedulerStart
@@ -2124,33 +2145,33 @@ LOAD /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-
  .text.RTOS_spinUnlock
                 0x0000000008000e02       0x1e Libraries/RTOS/src/rtos_spinlock.o
                 0x0000000008000e02                RTOS_spinUnlock
- .text.RTOS_threadListsInit
-                0x0000000008000e20       0x3c Libraries/RTOS/src/rtos_thread.o
-                0x0000000008000e20                RTOS_threadListsInit
- .text.RTOS_threadCreate
-                0x0000000008000e5c      0x1c0 Libraries/RTOS/src/rtos_thread.o
-                0x0000000008000e5c                RTOS_threadCreate
- .text.RTOS_threadGetRunning
-                0x000000000800101c       0x18 Libraries/RTOS/src/rtos_thread.o
-                0x000000000800101c                RTOS_threadGetRunning
- .text.RTOS_threadAddToReadyList
-                0x0000000008001034       0x78 Libraries/RTOS/src/rtos_thread.o
-                0x0000000008001034                RTOS_threadAddToReadyList
- .text.RTOS_threadAddToTimerList
-                0x00000000080010ac       0x40 Libraries/RTOS/src/rtos_thread.o
-                0x00000000080010ac                RTOS_threadAddToTimerList
- .text.RTOS_threadSwitch
-                0x00000000080010ec       0xb8 Libraries/RTOS/src/rtos_thread.o
-                0x00000000080010ec                RTOS_threadSwitch
- .text.RTOS_threadDelay
-                0x00000000080011a4       0x40 Libraries/RTOS/src/rtos_thread.o
-                0x00000000080011a4                RTOS_threadDelay
- .text.RTOS_threadDelayCheck
-                0x00000000080011e4       0x40 Libraries/RTOS/src/rtos_thread.o
-                0x00000000080011e4                RTOS_threadDelayCheck
- .text.RTOS_threadTerminate
-                0x0000000008001224       0x68 Libraries/RTOS/src/rtos_thread.o
-                0x0000000008001224                RTOS_threadTerminate
+ .text.RTOS_taskListsInit
+                0x0000000008000e20       0x3c Libraries/RTOS/src/rtos_task.o
+                0x0000000008000e20                RTOS_taskListsInit
+ .text.RTOS_taskCreate
+                0x0000000008000e5c      0x1c0 Libraries/RTOS/src/rtos_task.o
+                0x0000000008000e5c                RTOS_taskCreate
+ .text.RTOS_taskGetRunning
+                0x000000000800101c       0x18 Libraries/RTOS/src/rtos_task.o
+                0x000000000800101c                RTOS_taskGetRunning
+ .text.RTOS_taskAddToReadyList
+                0x0000000008001034       0x78 Libraries/RTOS/src/rtos_task.o
+                0x0000000008001034                RTOS_taskAddToReadyList
+ .text.RTOS_taskAddToTimerList
+                0x00000000080010ac       0x40 Libraries/RTOS/src/rtos_task.o
+                0x00000000080010ac                RTOS_taskAddToTimerList
+ .text.RTOS_taskSwitch
+                0x00000000080010ec       0xb8 Libraries/RTOS/src/rtos_task.o
+                0x00000000080010ec                RTOS_taskSwitch
+ .text.RTOS_taskDelay
+                0x00000000080011a4       0x40 Libraries/RTOS/src/rtos_task.o
+                0x00000000080011a4                RTOS_taskDelay
+ .text.RTOS_taskDelayCheck
+                0x00000000080011e4       0x40 Libraries/RTOS/src/rtos_task.o
+                0x00000000080011e4                RTOS_taskDelayCheck
+ .text.RTOS_taskTerminate
+                0x0000000008001224       0x68 Libraries/RTOS/src/rtos_task.o
+                0x0000000008001224                RTOS_taskTerminate
  .text.GPIO_Init
                 0x000000000800128c      0x11c Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
                 0x000000000800128c                GPIO_Init
@@ -2372,9 +2393,9 @@ LOAD /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-
  *(.data)
  *(.data*)
  .data.currentTopPriority
-                0x0000000020000000        0x4 Libraries/RTOS/src/rtos_thread.o
- .data.runningThreadID
-                0x0000000020000004        0x4 Libraries/RTOS/src/rtos_thread.o
+                0x0000000020000000        0x4 Libraries/RTOS/src/rtos_task.o
+ .data.runningTaskID
+                0x0000000020000004        0x4 Libraries/RTOS/src/rtos_task.o
  .data.SystemCoreClock
                 0x0000000020000008        0x4 src/system_stm32f4xx.o
                 0x0000000020000008                SystemCoreClock
@@ -2403,30 +2424,28 @@ LOAD /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-
  *(.bss)
  .bss           0x0000000020000020       0x1c /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtbegin.o
  *(.bss*)
- .bss.RTOS_idleThread
+ .bss.RTOS_idleTask
                 0x000000002000003c       0x38 Libraries/RTOS/src/rtos_scheduler.o
  *fill*         0x0000000020000074        0x4 
- .bss.RTOS_idleThreadStack
+ .bss.RTOS_idleTaskStack
                 0x0000000020000078     0x1000 Libraries/RTOS/src/rtos_scheduler.o
- .bss.pRunningThread
-                0x0000000020001078        0x4 Libraries/RTOS/src/rtos_thread.o
+ .bss.pRunningTask
+                0x0000000020001078        0x4 Libraries/RTOS/src/rtos_task.o
  .bss.RTOS_readyList
-                0x000000002000107c      0x100 Libraries/RTOS/src/rtos_thread.o
+                0x000000002000107c      0x100 Libraries/RTOS/src/rtos_task.o
  .bss.RTOS_delayList
-                0x000000002000117c       0x10 Libraries/RTOS/src/rtos_thread.o
- .bss.numThreads
-                0x000000002000118c        0x4 Libraries/RTOS/src/rtos_thread.o
+                0x000000002000117c       0x10 Libraries/RTOS/src/rtos_task.o
+ .bss.numTasks  0x000000002000118c        0x4 Libraries/RTOS/src/rtos_task.o
  *(COMMON)
  COMMON         0x0000000020001190        0x8 Libraries/RTOS/src/rtos_scheduler.o
                 0x0000000020001190                RTOS_systickCount
                 0x0000000020001194                RTOS_SVC_excReturn
- COMMON         0x0000000020001198     0x20ca src/main.o
+ COMMON         0x0000000020001198     0x20cc src/main.o
                 0x0000000020001198                mailbox
-                0x00000000200011e8                thread
-                0x0000000020001258                stack
-                0x0000000020003258                buffer
+                0x00000000200011e8                stack
+                0x00000000200031e8                buffer
+                0x00000000200031f4                task
                 0x0000000020003264                . = ALIGN (0x4)
- *fill*         0x0000000020003262        0x2 
                 0x0000000020003264                _ebss = .
                 0x0000000020003264                __bss_end__ = _ebss
 
@@ -2477,7 +2496,7 @@ LOAD /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-
  .ARM.attributes
                 0x000000000000020a       0x25 Libraries/RTOS/src/rtos_svc_calls.o
  .ARM.attributes
-                0x000000000000022f       0x39 Libraries/RTOS/src/rtos_thread.o
+                0x000000000000022f       0x39 Libraries/RTOS/src/rtos_task.o
  .ARM.attributes
                 0x0000000000000268       0x39 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
  .ARM.attributes
@@ -2508,7 +2527,7 @@ OUTPUT(Real Time Operating System.elf elf32-littlearm)
  .debug_info    0x0000000000004574      0xeae Libraries/RTOS/src/rtos_semaphore.o
  .debug_info    0x0000000000005422      0xaff Libraries/RTOS/src/rtos_spinlock.o
  .debug_info    0x0000000000005f21       0xbc Libraries/RTOS/src/rtos_svc_calls.o
- .debug_info    0x0000000000005fdd      0xe8f Libraries/RTOS/src/rtos_thread.o
+ .debug_info    0x0000000000005fdd      0xe8f Libraries/RTOS/src/rtos_task.o
  .debug_info    0x0000000000006e6c      0x628 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
  .debug_info    0x0000000000007494      0xe36 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
  .debug_info    0x00000000000082ca      0xde1 src/main.o
@@ -2526,7 +2545,7 @@ OUTPUT(Real Time Operating System.elf elf32-littlearm)
  .debug_abbrev  0x0000000000000b35      0x25b Libraries/RTOS/src/rtos_semaphore.o
  .debug_abbrev  0x0000000000000d90      0x243 Libraries/RTOS/src/rtos_spinlock.o
  .debug_abbrev  0x0000000000000fd3       0x14 Libraries/RTOS/src/rtos_svc_calls.o
- .debug_abbrev  0x0000000000000fe7      0x25f Libraries/RTOS/src/rtos_thread.o
+ .debug_abbrev  0x0000000000000fe7      0x25f Libraries/RTOS/src/rtos_task.o
  .debug_abbrev  0x0000000000001246      0x1b8 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
  .debug_abbrev  0x00000000000013fe      0x1cf Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
  .debug_abbrev  0x00000000000015cd      0x209 src/main.o
@@ -2554,7 +2573,7 @@ OUTPUT(Real Time Operating System.elf elf32-littlearm)
  .debug_aranges
                 0x0000000000000198       0x20 Libraries/RTOS/src/rtos_svc_calls.o
  .debug_aranges
-                0x00000000000001b8       0x60 Libraries/RTOS/src/rtos_thread.o
+                0x00000000000001b8       0x60 Libraries/RTOS/src/rtos_task.o
  .debug_aranges
                 0x0000000000000218       0x88 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
  .debug_aranges
@@ -2576,7 +2595,7 @@ OUTPUT(Real Time Operating System.elf elf32-littlearm)
  .debug_ranges  0x00000000000000a0       0x28 Libraries/RTOS/src/rtos_scheduler.o
  .debug_ranges  0x00000000000000c8       0x20 Libraries/RTOS/src/rtos_semaphore.o
  .debug_ranges  0x00000000000000e8       0x20 Libraries/RTOS/src/rtos_spinlock.o
- .debug_ranges  0x0000000000000108       0x50 Libraries/RTOS/src/rtos_thread.o
+ .debug_ranges  0x0000000000000108       0x50 Libraries/RTOS/src/rtos_task.o
  .debug_ranges  0x0000000000000158       0x78 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
  .debug_ranges  0x00000000000001d0      0x1a8 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
  .debug_ranges  0x0000000000000378       0x20 src/main.o
@@ -2584,50 +2603,50 @@ OUTPUT(Real Time Operating System.elf elf32-littlearm)
  .debug_ranges  0x00000000000003b8       0x50 src/stm32f4xx_it.o
  .debug_ranges  0x0000000000000408       0x20 src/system_stm32f4xx.o
 
-.debug_line     0x0000000000000000     0x2caf
- .debug_line    0x0000000000000000      0x3b3 Libraries/RTOS/src/rtos.o
- .debug_line    0x00000000000003b3       0x7b Libraries/RTOS/src/rtos_handlers.o
- .debug_line    0x000000000000042e      0x336 Libraries/RTOS/src/rtos_list.o
- .debug_line    0x0000000000000764      0x359 Libraries/RTOS/src/rtos_mailbox.o
- .debug_line    0x0000000000000abd      0x335 Libraries/RTOS/src/rtos_mutex.o
- .debug_line    0x0000000000000df2      0x2d8 Libraries/RTOS/src/rtos_scheduler.o
- .debug_line    0x00000000000010ca      0x361 Libraries/RTOS/src/rtos_semaphore.o
- .debug_line    0x000000000000142b      0x304 Libraries/RTOS/src/rtos_spinlock.o
- .debug_line    0x000000000000172f       0x75 Libraries/RTOS/src/rtos_svc_calls.o
- .debug_line    0x00000000000017a4      0x3be Libraries/RTOS/src/rtos_thread.o
- .debug_line    0x0000000000001b62      0x372 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
- .debug_line    0x0000000000001ed4      0x64e Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
- .debug_line    0x0000000000002522      0x2f5 src/main.o
- .debug_line    0x0000000000002817       0x7a src/startup_stm32f429x.o
- .debug_line    0x0000000000002891      0x214 src/stm32f4xx_it.o
- .debug_line    0x0000000000002aa5      0x20a src/system_stm32f4xx.o
+.debug_line     0x0000000000000000     0x2ca1
+ .debug_line    0x0000000000000000      0x3b1 Libraries/RTOS/src/rtos.o
+ .debug_line    0x00000000000003b1       0x7b Libraries/RTOS/src/rtos_handlers.o
+ .debug_line    0x000000000000042c      0x336 Libraries/RTOS/src/rtos_list.o
+ .debug_line    0x0000000000000762      0x359 Libraries/RTOS/src/rtos_mailbox.o
+ .debug_line    0x0000000000000abb      0x333 Libraries/RTOS/src/rtos_mutex.o
+ .debug_line    0x0000000000000dee      0x2d6 Libraries/RTOS/src/rtos_scheduler.o
+ .debug_line    0x00000000000010c4      0x35f Libraries/RTOS/src/rtos_semaphore.o
+ .debug_line    0x0000000000001423      0x304 Libraries/RTOS/src/rtos_spinlock.o
+ .debug_line    0x0000000000001727       0x75 Libraries/RTOS/src/rtos_svc_calls.o
+ .debug_line    0x000000000000179c      0x3ba Libraries/RTOS/src/rtos_task.o
+ .debug_line    0x0000000000001b56      0x372 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
+ .debug_line    0x0000000000001ec8      0x64e Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
+ .debug_line    0x0000000000002516      0x2f3 src/main.o
+ .debug_line    0x0000000000002809       0x7a src/startup_stm32f429x.o
+ .debug_line    0x0000000000002883      0x214 src/stm32f4xx_it.o
+ .debug_line    0x0000000000002a97      0x20a src/system_stm32f4xx.o
 
-.debug_str      0x0000000000000000     0x1ff2
- .debug_str     0x0000000000000000      0xf1a Libraries/RTOS/src/rtos.o
-                                        0xfd7 (size before relaxing)
- .debug_str     0x0000000000000f1a       0x7a Libraries/RTOS/src/rtos_list.o
-                                        0x734 (size before relaxing)
- .debug_str     0x0000000000000f94       0x6e Libraries/RTOS/src/rtos_mailbox.o
-                                        0x80f (size before relaxing)
- .debug_str     0x0000000000001002       0x80 Libraries/RTOS/src/rtos_mutex.o
-                                        0x8c3 (size before relaxing)
- .debug_str     0x0000000000001082      0x113 Libraries/RTOS/src/rtos_scheduler.o
-                                        0x8d3 (size before relaxing)
- .debug_str     0x0000000000001195       0x6d Libraries/RTOS/src/rtos_semaphore.o
-                                        0x8df (size before relaxing)
- .debug_str     0x0000000000001202       0x5c Libraries/RTOS/src/rtos_spinlock.o
+.debug_str      0x0000000000000000     0x1fbc
+ .debug_str     0x0000000000000000      0xf08 Libraries/RTOS/src/rtos.o
+                                        0xfc5 (size before relaxing)
+ .debug_str     0x0000000000000f08       0x7a Libraries/RTOS/src/rtos_list.o
                                         0x732 (size before relaxing)
- .debug_str     0x000000000000125e      0x152 Libraries/RTOS/src/rtos_thread.o
-                                        0x95b (size before relaxing)
- .debug_str     0x00000000000013b0      0x33f Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
+ .debug_str     0x0000000000000f82       0x6e Libraries/RTOS/src/rtos_mailbox.o
+                                        0x80d (size before relaxing)
+ .debug_str     0x0000000000000ff0       0x80 Libraries/RTOS/src/rtos_mutex.o
+                                        0x8b1 (size before relaxing)
+ .debug_str     0x0000000000001070      0x10b Libraries/RTOS/src/rtos_scheduler.o
+                                        0x8b9 (size before relaxing)
+ .debug_str     0x000000000000117b       0x6d Libraries/RTOS/src/rtos_semaphore.o
+                                        0x8cd (size before relaxing)
+ .debug_str     0x00000000000011e8       0x5c Libraries/RTOS/src/rtos_spinlock.o
+                                        0x732 (size before relaxing)
+ .debug_str     0x0000000000001244      0x138 Libraries/RTOS/src/rtos_task.o
+                                        0x92f (size before relaxing)
+ .debug_str     0x000000000000137c      0x33f Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
                                         0x55e (size before relaxing)
- .debug_str     0x00000000000016ef      0x7a1 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
+ .debug_str     0x00000000000016bb      0x7a1 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
                                         0xa58 (size before relaxing)
- .debug_str     0x0000000000001e90       0x3d src/main.o
-                                        0xa36 (size before relaxing)
- .debug_str     0x0000000000001ecd       0x96 src/stm32f4xx_it.o
+ .debug_str     0x0000000000001e5c       0x3b src/main.o
+                                        0xa22 (size before relaxing)
+ .debug_str     0x0000000000001e97       0x96 src/stm32f4xx_it.o
                                         0x2aa (size before relaxing)
- .debug_str     0x0000000000001f63       0x8f src/system_stm32f4xx.o
+ .debug_str     0x0000000000001f2d       0x8f src/system_stm32f4xx.o
                                         0x450 (size before relaxing)
 
 .comment        0x0000000000000000       0x7c
@@ -2639,7 +2658,7 @@ OUTPUT(Real Time Operating System.elf elf32-littlearm)
  .comment       0x000000000000007c       0x7d Libraries/RTOS/src/rtos_scheduler.o
  .comment       0x000000000000007c       0x7d Libraries/RTOS/src/rtos_semaphore.o
  .comment       0x000000000000007c       0x7d Libraries/RTOS/src/rtos_spinlock.o
- .comment       0x000000000000007c       0x7d Libraries/RTOS/src/rtos_thread.o
+ .comment       0x000000000000007c       0x7d Libraries/RTOS/src/rtos_task.o
  .comment       0x000000000000007c       0x7d Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
  .comment       0x000000000000007c       0x7d Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
  .comment       0x000000000000007c       0x7d src/main.o
@@ -2654,7 +2673,7 @@ OUTPUT(Real Time Operating System.elf elf32-littlearm)
  .debug_frame   0x00000000000002a0       0x88 Libraries/RTOS/src/rtos_scheduler.o
  .debug_frame   0x0000000000000328       0x7c Libraries/RTOS/src/rtos_semaphore.o
  .debug_frame   0x00000000000003a4       0x88 Libraries/RTOS/src/rtos_spinlock.o
- .debug_frame   0x000000000000042c      0x158 Libraries/RTOS/src/rtos_thread.o
+ .debug_frame   0x000000000000042c      0x158 Libraries/RTOS/src/rtos_task.o
  .debug_frame   0x0000000000000584      0x23c Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.o
  .debug_frame   0x00000000000007c0      0x814 Libraries/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.o
  .debug_frame   0x0000000000000fd4       0x70 src/main.o
@@ -3326,29 +3345,35 @@ RTOS_SVC_semaphoreWait                            Libraries/RTOS/src/rtos_svc_ca
 RTOS_SVC_spinInit                                 Libraries/RTOS/src/rtos_svc_calls.o
 RTOS_SVC_spinLock                                 Libraries/RTOS/src/rtos_svc_calls.o
 RTOS_SVC_spinUnlock                               Libraries/RTOS/src/rtos_svc_calls.o
-RTOS_SVC_threadCreate                             Libraries/RTOS/src/rtos_svc_calls.o
+RTOS_SVC_taskCreate                               Libraries/RTOS/src/rtos_svc_calls.o
                                                   src/main.o
-RTOS_SVC_threadDelay                              Libraries/RTOS/src/rtos_svc_calls.o
+RTOS_SVC_taskDelay                                Libraries/RTOS/src/rtos_svc_calls.o
                                                   src/main.o
-RTOS_SVC_threadTerminate                          Libraries/RTOS/src/rtos_svc_calls.o
+RTOS_SVC_taskTerminate                            Libraries/RTOS/src/rtos_svc_calls.o
 RTOS_SysTick_Handler                              Libraries/RTOS/src/rtos_scheduler.o
                                                   src/startup_stm32f429x.o
+RTOS_bSemaphoreInit                               Libraries/RTOS/src/rtos_bsemaphore.o
+RTOS_bSemaphoreSignal                             Libraries/RTOS/src/rtos_bsemaphore.o
+RTOS_bSemaphoreWait                               Libraries/RTOS/src/rtos_bsemaphore.o
 RTOS_init                                         Libraries/RTOS/src/rtos.o
                                                   src/main.o
 RTOS_listInit                                     Libraries/RTOS/src/rtos_list.o
-                                                  Libraries/RTOS/src/rtos_thread.o
+                                                  Libraries/RTOS/src/rtos_task.o
                                                   Libraries/RTOS/src/rtos_semaphore.o
                                                   Libraries/RTOS/src/rtos_mutex.o
+                                                  Libraries/RTOS/src/rtos_bsemaphore.o
 RTOS_listInsert                                   Libraries/RTOS/src/rtos_list.o
-                                                  Libraries/RTOS/src/rtos_thread.o
+                                                  Libraries/RTOS/src/rtos_task.o
                                                   Libraries/RTOS/src/rtos_semaphore.o
                                                   Libraries/RTOS/src/rtos_mutex.o
+                                                  Libraries/RTOS/src/rtos_bsemaphore.o
 RTOS_listInsertEnd                                Libraries/RTOS/src/rtos_list.o
-                                                  Libraries/RTOS/src/rtos_thread.o
+                                                  Libraries/RTOS/src/rtos_task.o
 RTOS_listRemove                                   Libraries/RTOS/src/rtos_list.o
-                                                  Libraries/RTOS/src/rtos_thread.o
+                                                  Libraries/RTOS/src/rtos_task.o
                                                   Libraries/RTOS/src/rtos_semaphore.o
                                                   Libraries/RTOS/src/rtos_mutex.o
+                                                  Libraries/RTOS/src/rtos_bsemaphore.o
 RTOS_mailBoxInit                                  Libraries/RTOS/src/rtos_mailbox.o
                                                   Libraries/RTOS/src/rtos.o
 RTOS_mailBoxReceive                               Libraries/RTOS/src/rtos_mailbox.o
@@ -3362,7 +3387,7 @@ RTOS_mutexLock                                    Libraries/RTOS/src/rtos_mutex.
 RTOS_mutexUnlock                                  Libraries/RTOS/src/rtos_mutex.o
                                                   Libraries/RTOS/src/rtos.o
 RTOS_schedulerGetSystickCount                     Libraries/RTOS/src/rtos_scheduler.o
-                                                  Libraries/RTOS/src/rtos_thread.o
+                                                  Libraries/RTOS/src/rtos_task.o
 RTOS_schedulerStart                               Libraries/RTOS/src/rtos_scheduler.o
                                                   Libraries/RTOS/src/rtos.o
 RTOS_semaphoreInit                                Libraries/RTOS/src/rtos_semaphore.o
@@ -3381,30 +3406,33 @@ RTOS_spinLock                                     Libraries/RTOS/src/rtos_spinlo
 RTOS_spinUnlock                                   Libraries/RTOS/src/rtos_spinlock.o
                                                   Libraries/RTOS/src/rtos.o
 RTOS_systickCount                                 Libraries/RTOS/src/rtos_scheduler.o
-RTOS_threadAddToReadyList                         Libraries/RTOS/src/rtos_thread.o
+RTOS_taskAddToReadyList                           Libraries/RTOS/src/rtos_task.o
                                                   Libraries/RTOS/src/rtos_semaphore.o
                                                   Libraries/RTOS/src/rtos_mutex.o
-RTOS_threadAddToTimerList                         Libraries/RTOS/src/rtos_thread.o
+                                                  Libraries/RTOS/src/rtos_bsemaphore.o
+RTOS_taskAddToTimerList                           Libraries/RTOS/src/rtos_task.o
                                                   Libraries/RTOS/src/rtos_semaphore.o
                                                   Libraries/RTOS/src/rtos_mutex.o
-RTOS_threadCreate                                 Libraries/RTOS/src/rtos_thread.o
+                                                  Libraries/RTOS/src/rtos_bsemaphore.o
+RTOS_taskCreate                                   Libraries/RTOS/src/rtos_task.o
                                                   Libraries/RTOS/src/rtos_scheduler.o
                                                   Libraries/RTOS/src/rtos.o
-RTOS_threadDelay                                  Libraries/RTOS/src/rtos_thread.o
+RTOS_taskDelay                                    Libraries/RTOS/src/rtos_task.o
                                                   Libraries/RTOS/src/rtos.o
-RTOS_threadDelayCheck                             Libraries/RTOS/src/rtos_thread.o
+RTOS_taskDelayCheck                               Libraries/RTOS/src/rtos_task.o
                                                   Libraries/RTOS/src/rtos_scheduler.o
-RTOS_threadGetRunning                             Libraries/RTOS/src/rtos_thread.o
+RTOS_taskGetRunning                               Libraries/RTOS/src/rtos_task.o
                                                   Libraries/RTOS/src/rtos_semaphore.o
                                                   Libraries/RTOS/src/rtos_scheduler.o
                                                   Libraries/RTOS/src/rtos_mutex.o
                                                   Libraries/RTOS/src/rtos_handlers.o
-RTOS_threadListsInit                              Libraries/RTOS/src/rtos_thread.o
+                                                  Libraries/RTOS/src/rtos_bsemaphore.o
+RTOS_taskListsInit                                Libraries/RTOS/src/rtos_task.o
                                                   Libraries/RTOS/src/rtos.o
-RTOS_threadSwitch                                 Libraries/RTOS/src/rtos_thread.o
+RTOS_taskSwitch                                   Libraries/RTOS/src/rtos_task.o
                                                   Libraries/RTOS/src/rtos_scheduler.o
                                                   Libraries/RTOS/src/rtos_handlers.o
-RTOS_threadTerminate                              Libraries/RTOS/src/rtos_thread.o
+RTOS_taskTerminate                                Libraries/RTOS/src/rtos_task.o
                                                   Libraries/RTOS/src/rtos.o
 Reset_Handler                                     src/startup_stm32f429x.o
 SAI1_IRQHandler                                   src/startup_stm32f429x.o
@@ -3688,4 +3716,4 @@ main                                              src/main.o
 memcpy                                            /opt/Atollic_TrueSTUDIO_for_STM32_x86_64_9.3.0/ARMTools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/../../../../arm-atollic-eabi/lib/armv7e-m/fpu/libc_nano.a(lib_a-memcpy-stub.o)
                                                   Libraries/RTOS/src/rtos_mailbox.o
 stack                                             src/main.o
-thread                                            src/main.o
+task                                              src/main.o

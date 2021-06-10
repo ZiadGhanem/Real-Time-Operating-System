@@ -9,7 +9,7 @@
 #define RTOS_INC_RTOS_SCHEDULER_H_
 
 #include "rtos.h"
-#include "rtos_thread.h"
+#include "rtos_task.h"
 
 extern void RTOS_SVC_schedulerStart(void);
 void RTOS_schedulerStart(void);

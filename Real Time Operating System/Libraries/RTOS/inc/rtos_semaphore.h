@@ -10,7 +10,7 @@
 
 #include "rtos.h"
 #include "rtos_list.h"
-#include "rtos_thread.h"
+#include "rtos_task.h"
 
 /** RTOS Semaphores
  * semaphoreList -> The semaphore's blocked list

@@ -74,19 +74,19 @@ RTOS_returnStatus RTOS_semaphoreWait(RTOS_semaphore_t* pSemaphore, uint32_t wait
 	/* If the semaphore was not acquired successfully */
 	if(returnStatus == RTOS_FAIL && waitTicks > 0)
 	{
-		/* Get the currently running thread */
-		RTOS_thread_t* pThread = RTOS_threadGetRunning();
-		/* Remove the thread from the ready list */
-		RTOS_listRemove(& pThread->listItem);
+		/* Get the currently running task */
+		RTOS_task_t* pTask = RTOS_taskGetRunning();
+		/* Remove the task from the ready list */
+		RTOS_listRemove(& pTask->listItem);
 		/* Set the items ordering value for the semaphores list */
-		pThread->eventListItem.orderValue = pThread->priority;
-		/* Add the thread to the semaphores list */
-		RTOS_listInsert(&pSemaphore->semaphoreList, & pThread->eventListItem);
+		pTask->eventListItem.orderValue = pTask->priority;
+		/* Add the task to the semaphores list */
+		RTOS_listInsert(&pSemaphore->semaphoreList, & pTask->eventListItem);
 
-		/* Add the thread to timer's list */
+		/* Add the task to timer's list */
 		if(waitTicks != RTOS_WAITFOREVER)
 		{
-			RTOS_threadAddToTimerList(pThread, waitTicks);
+			RTOS_taskAddToTimerList(pTask, waitTicks);
 
 		}
 		else
@@ -129,23 +129,23 @@ void RTOS_semaphoreSignal(RTOS_semaphore_t* pSemaphore)
 	/* Data Memory Barrier */
 	__DMB();
 
-	/* Check if any threads are blocked */
+	/* Check if any tasks are blocked */
 	if(pSemaphore->semaphoreList.numListItems > 0)
 	{
-		/* Remove a thread from the semaphore list */
-		RTOS_thread_t* pThread = pSemaphore->semaphoreList.endItem.pPrev->pThread;
-		RTOS_listRemove(& pThread->eventListItem);
-		/* Check if the thread was delayed then remove it from delay list */
-		if(pThread->listItem.pList != NULL)
+		/* Remove a task from the semaphore list */
+		RTOS_task_t* pTask = pSemaphore->semaphoreList.endItem.pPrev->pTask;
+		RTOS_listRemove(& pTask->eventListItem);
+		/* Check if the task was delayed then remove it from delay list */
+		if(pTask->listItem.pList != NULL)
 		{
-			RTOS_listRemove(& pThread->listItem);
+			RTOS_listRemove(& pTask->listItem);
 		}
 		else
 		{
 
 		}
-		/* Place this thread in the ready list */
-		RTOS_threadAddToReadyList(pThread);
+		/* Place this task in the ready list */
+		RTOS_taskAddToReadyList(pTask);
 	}
 	else
 	{

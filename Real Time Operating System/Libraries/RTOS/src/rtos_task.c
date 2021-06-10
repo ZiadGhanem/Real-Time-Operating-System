@@ -1,24 +1,24 @@
 /*
- * rtos_thread.c
+ * rtos_task.c
  *
  *  Created on: May 17, 2021
  *      Author: ziadyasser
  */
 
-#include "rtos_thread.h"
+#include <rtos_task.h>
 
-/* Current top thread priority */
+/* Current top task priority */
 static uint32_t currentTopPriority = MAX_PRIORITY_LEVEL - 1;
-/* Pointer to the current running thread */
-static RTOS_thread_t* pRunningThread = NULL;
-/* The ID of the current running thread */
-static int32_t runningThreadID = -1;
+/* Pointer to the current running task */
+static RTOS_task_t* pRunningTask = NULL;
+/* The ID of the current running task */
+static int32_t runningTaskID = -1;
 /* RTOS ready lists */
 static RTOS_list_t RTOS_readyList[MAX_PRIORITY_LEVEL];
 /* RTOS delayed list */
 static RTOS_list_t RTOS_delayList;
-/* Thread ID numbering */
-static int32_t numThreads = 0;
+/* Task ID numbering */
+static int32_t numTasks = 0;
 
 /*
  * This function initializes the used lists
@@ -27,7 +27,7 @@ static int32_t numThreads = 0;
  * Return:
  * 	None
  */
-void RTOS_threadListsInit(void)
+void RTOS_taskListsInit(void)
 {
 	/* Initialize the ready lists */
 	uint32_t i;
@@ -39,25 +39,25 @@ void RTOS_threadListsInit(void)
 }
 
 /*
- * This function creates a new thread and its it to the desired list
+ * This function creates a new task and its it to the desired list
  * Inputs:
- *  pThread -> The RTOS thread object
- *  pStack -> The Stack of the new thread
- * 	pFunction -> The RTOS thread function
- * 	priority -> The thread priority level
+ *  pTask -> The RTOS task object
+ *  pStack -> The Stack of the new task
+ * 	pFunction -> The RTOS task function
+ * 	priority -> The task priority level
  * Return:
  * 	None
  */
-void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, uint32_t stackSize, void* pFunction, uint32_t priority)
+void RTOS_taskCreate(RTOS_task_t* pTask, RTOS_stack_t* pStack, uint32_t stackSize, void* pFunction, uint32_t priority)
 {
-	ASSERT(pThread != NULL);
+	ASSERT(pTask != NULL);
 	ASSERT(pStack != NULL);
 	ASSERT(stackSize <= MAX_STACK_SIZE);
 	ASSERT(pFunction != NULL);
 	ASSERT((priority < MAX_PRIORITY_LEVEL) && (priority >= 0));
 
 	/* Stack: xPSR, PC, LR, R12, R3, R1, R1, R0 are automatically pushed,
-	 * 		 while the rest are pushed manually during thread switching
+	 * 		 while the rest are pushed manually during task switching
 	 * EXC_RETURN
 	 * CONTROL
 	 * R4
@@ -83,57 +83,57 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, uint32_t st
 	stackSize = (stackSize / 8) * 8;
 
 	/* Initialize the stack pointer */
-	pThread->pStack = (uint32_t)pStack + stackSize * 8 - 18 * 4;
+	pTask->pStack = (uint32_t)pStack + stackSize * 8 - 18 * 4;
 
 	/* For testing */
-	MEM32WORD(pThread->pStack + (2 << 2)) = 0x4;
-	MEM32WORD(pThread->pStack + (3 << 2)) = 0x5;
-	MEM32WORD(pThread->pStack + (4 << 2)) = 0x6;
-	MEM32WORD(pThread->pStack + (5 << 2)) = 0x7;
-	MEM32WORD(pThread->pStack + (6 << 2)) = 0x8;
-	MEM32WORD(pThread->pStack + (7 << 2)) = 0x9;
-	MEM32WORD(pThread->pStack + (8 << 2)) = 0x10;
-	MEM32WORD(pThread->pStack + (9 << 2)) = 0x11;
-	MEM32WORD(pThread->pStack + (10 << 2)) = 0x1;
-	MEM32WORD(pThread->pStack + (11 << 2)) = 0x2;
-	MEM32WORD(pThread->pStack + (12 << 2)) = 0x3;
-	MEM32WORD(pThread->pStack + (13 << 2)) = 0x4;
-	MEM32WORD(pThread->pStack + (14 << 2)) = 0x12;
+	MEM32WORD(pTask->pStack + (2 << 2)) = 0x4;
+	MEM32WORD(pTask->pStack + (3 << 2)) = 0x5;
+	MEM32WORD(pTask->pStack + (4 << 2)) = 0x6;
+	MEM32WORD(pTask->pStack + (5 << 2)) = 0x7;
+	MEM32WORD(pTask->pStack + (6 << 2)) = 0x8;
+	MEM32WORD(pTask->pStack + (7 << 2)) = 0x9;
+	MEM32WORD(pTask->pStack + (8 << 2)) = 0x10;
+	MEM32WORD(pTask->pStack + (9 << 2)) = 0x11;
+	MEM32WORD(pTask->pStack + (10 << 2)) = 0x1;
+	MEM32WORD(pTask->pStack + (11 << 2)) = 0x2;
+	MEM32WORD(pTask->pStack + (12 << 2)) = 0x3;
+	MEM32WORD(pTask->pStack + (13 << 2)) = 0x4;
+	MEM32WORD(pTask->pStack + (14 << 2)) = 0x12;
 
-	/* Initialize EXC_RETURN (Return to thread mode using PSP) */
-	MEM32WORD(pThread->pStack) = 0xFFFFFFFDUL;
+	/* Initialize EXC_RETURN (Return to task mode using PSP) */
+	MEM32WORD(pTask->pStack) = 0xFFFFFFFDUL;
 
 	/* Initialize the CONTROL Register (No FPU, PSP, Unprivileged mode)*/
-	MEM32WORD(pThread->pStack + (1 << 2)) = 0x3;
+	MEM32WORD(pTask->pStack + (1 << 2)) = 0x3;
 
 	/* Initialize the program counter */
-	MEM32WORD(pThread->pStack + (16 << 2)) = (uint32_t)pFunction;
+	MEM32WORD(pTask->pStack + (16 << 2)) = (uint32_t)pFunction;
 
 	/* Initialize the xPSR register to only Thumb mode*/
-	MEM32WORD(pThread->pStack + (17 << 2)) = 0x01000000;
+	MEM32WORD(pTask->pStack + (17 << 2)) = 0x01000000;
 
 	/* Set the priority level */
-	pThread->priority = priority;
+	pTask->priority = priority;
 
-	/* Set thread ID */
-	pThread->threadId = numThreads;
-	numThreads++;
+	/* Set task ID */
+	pTask->taskId = numTasks;
+	numTasks++;
 
-	/* Set the thread state to ready */
-	pThread->threadState = RTOS_THREADREADY;
+	/* Set the task state to ready */
+	pTask->taskState = RTOS_TASKREADY;
 
-	/* Set the thread's list item thread pointer */
-	pThread->listItem.pThread = pThread;
-	pThread->eventListItem.pThread = pThread;
+	/* Set the task's list item task pointer */
+	pTask->listItem.pTask = pTask;
+	pTask->eventListItem.pTask = pTask;
 
-	/* Set the thread's list item to none */
-	pThread->listItem.pList = NULL;
-	pThread->eventListItem.pList = NULL;
+	/* Set the task's list item to none */
+	pTask->listItem.pList = NULL;
+	pTask->eventListItem.pList = NULL;
 
-	/* Add the thread to the ready list */
-	RTOS_listInsertEnd(&RTOS_readyList[priority], &pThread->listItem);
+	/* Add the task to the ready list */
+	RTOS_listInsertEnd(&RTOS_readyList[priority], &pTask->listItem);
 
-	/* Check if the new thread has a new highest priority */
+	/* Check if the new task has a new highest priority */
 	if(priority < currentTopPriority)
 	{
 		currentTopPriority = priority;
@@ -143,8 +143,8 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, uint32_t st
 
 	}
 
-	/* Check if the scheduler has started and the currently running thread has a lower priority */
-	if((pRunningThread != NULL) && (priority < pRunningThread->priority))
+	/* Check if the scheduler has started and the currently running task has a lower priority */
+	if((pRunningTask != NULL) && (priority < pRunningTask->priority))
 	{
 		/* Invoke a pendSV exception */
 	    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
@@ -158,44 +158,44 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, uint32_t st
 
 
 /*
- * This function returns the running thread
+ * This function returns the running task
  * Inputs:
  *  None
  * Return:
- * 	Pointer to the running thread
+ * 	Pointer to the running task
  */
-RTOS_thread_t* RTOS_threadGetRunning(void)
+RTOS_task_t* RTOS_taskGetRunning(void)
 {
-	return pRunningThread;
+	return pRunningTask;
 }
 
 /*
- * This function adds the thread to its ready list
+ * This function adds the task to its ready list
  * Inputs:
- *  pThread -> The thread to be inserted in the ready list
+ *  pTask -> The task to be inserted in the ready list
  * Return:
  * 	None
  */
-void RTOS_threadAddToReadyList(RTOS_thread_t* pThread)
+void RTOS_taskAddToReadyList(RTOS_task_t* pTask)
 {
-	RTOS_listItem_t* pListItem = &pThread->listItem;
-	/* Add the thread to ready list */
-	RTOS_listInsertEnd(&RTOS_readyList[pThread->priority], pListItem);
-	/* Set the thread state as ready */
-	pThread->threadState = RTOS_THREADREADY;
-	/* Check if the thread has a new highest priority */
-	if(pThread->priority < currentTopPriority)
+	RTOS_listItem_t* pListItem = &pTask->listItem;
+	/* Add the task to ready list */
+	RTOS_listInsertEnd(&RTOS_readyList[pTask->priority], pListItem);
+	/* Set the task state as ready */
+	pTask->taskState = RTOS_TASKREADY;
+	/* Check if the task has a new highest priority */
+	if(pTask->priority < currentTopPriority)
 	{
 		/* Set the new top priority */
-		currentTopPriority = pThread->priority;
+		currentTopPriority = pTask->priority;
 	}
 	else
 	{
 
 	}
 
-	if(pRunningThread != NULL &&
-	(pThread->priority < pRunningThread->priority))
+	if(pRunningTask != NULL &&
+	(pTask->priority < pRunningTask->priority))
 	{
 		/* Invoke a pendSV exception */
 		SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
@@ -206,37 +206,37 @@ void RTOS_threadAddToReadyList(RTOS_thread_t* pThread)
 }
 
 /*
- * This function adds the thread to the timer's list
+ * This function adds the task to the timer's list
  * Inputs:
- *  pThread -> The thread to be inserted in the ready list
+ *  pTask -> The task to be inserted in the ready list
  *  waitTicks -> Number of systicks to be delayed
  * Return:
  * 	None
  */
-void RTOS_threadAddToTimerList(RTOS_thread_t* pThread, uint32_t waitTicks)
+void RTOS_taskAddToTimerList(RTOS_task_t* pTask, uint32_t waitTicks)
 {
 	/* Get the list item */
-	RTOS_listItem_t* pListItem = & pThread->listItem;
+	RTOS_listItem_t* pListItem = & pTask->listItem;
 
 	/* Set the delay amount */
 	pListItem->orderValue = RTOS_schedulerGetSystickCount() + waitTicks;
 
-	/* Add the thread to the delayed list */
+	/* Add the task to the delayed list */
 	RTOS_listInsert(&RTOS_delayList, pListItem);
 
-	/* Set the thread state to blocked */
-	pRunningThread->threadState = RTOS_THREADBLOCKED;
+	/* Set the task state to blocked */
+	pRunningTask->taskState = RTOS_TASKBLOCKED;
 }
 
 
 /*
- * This function switches the currently running thread
+ * This function switches the currently running task
  * Inputs:
  *  None
  * Return:
  * 	None
  */
-void RTOS_threadSwitch(void)
+void RTOS_taskSwitch(void)
 {
 	/* Check if the current top priority list became empty */
 	while(RTOS_readyList[currentTopPriority].numListItems == 0)
@@ -244,7 +244,7 @@ void RTOS_threadSwitch(void)
 		currentTopPriority++;
 	}
 
-	/* Get the next thread in the list */
+	/* Get the next task in the list */
 	RTOS_readyList[currentTopPriority].pIndex = RTOS_readyList[currentTopPriority].pIndex->pNext;
 
 	/* Check if the current index is the end item */
@@ -254,57 +254,57 @@ void RTOS_threadSwitch(void)
 		RTOS_readyList[currentTopPriority].pIndex = RTOS_readyList[currentTopPriority].pIndex->pNext;
 	}
 
-	RTOS_thread_t* pThread = RTOS_readyList[currentTopPriority].pIndex->pThread;
+	RTOS_task_t* pTask = RTOS_readyList[currentTopPriority].pIndex->pTask;
 
-	/* Set the currently running thread */
-	pRunningThread = pThread;
-	runningThreadID = pThread->threadId;
+	/* Set the currently running task */
+	pRunningTask = pTask;
+	runningTaskID = pTask->taskId;
 
-	/* Set the thread state to running */
-	pThread->threadState = RTOS_THREADRUNNING;
+	/* Set the task state to running */
+	pTask->taskState = RTOS_TASKRUNNING;
 }
 
 
 /*
- * This function delays the currently running thread
+ * This function delays the currently running task
  * Inputs:
  *  waitTicks -> Number of system ticks to be delayed
  * Return:
  * 	None
  */
-void RTOS_threadDelay(uint32_t waitTicks)
+void RTOS_taskDelay(uint32_t waitTicks)
 {
-	/* Remove the current thread from ready list */
-	RTOS_listItem_t* pListItem = & pRunningThread->listItem;
+	/* Remove the current task from ready list */
+	RTOS_listItem_t* pListItem = & pRunningTask->listItem;
 	RTOS_listRemove(pListItem);
 
-	/* Add the thread to timer list */
-	RTOS_threadAddToTimerList(pListItem->pThread, waitTicks);
+	/* Add the task to timer list */
+	RTOS_taskAddToTimerList(pListItem->pTask, waitTicks);
 
 	/* Invoke a pendSV exception */
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
 }
 
 /*
- * This function checks if any of the blocked threads can be transferred to the ready list
+ * This function checks if any of the blocked tasks can be transferred to the ready list
  * Inputs:
  *  None
  * Return:
  * 	None
  */
-void RTOS_threadDelayCheck(void)
+void RTOS_taskDelayCheck(void)
 {
 	if(RTOS_delayList.numListItems > 0)
 	{
-		/* Check for delayed threads */
+		/* Check for delayed tasks */
 		RTOS_listItem_t* pListItem = RTOS_delayList.endItem.pPrev;
 		if(pListItem->orderValue <= RTOS_schedulerGetSystickCount())
 		{
-			/* Remove the current thread from delay list */
+			/* Remove the current task from delay list */
 			RTOS_listRemove(pListItem);
 
-			/* Add the thread to the ready list */
-			RTOS_threadAddToReadyList(pListItem->pThread);
+			/* Add the task to the ready list */
+			RTOS_taskAddToReadyList(pListItem->pTask);
 		}
 		else
 		{
@@ -319,28 +319,28 @@ void RTOS_threadDelayCheck(void)
 
 
 /*
- * This function terminates a thread
+ * This function terminates a task
  * Inputs:
- *  pThread -> Pointer to the thread to be deleted
+ *  pTask -> Pointer to the task to be deleted
  * Return:
  * 	None
  */
-void RTOS_threadTerminate(RTOS_thread_t* pThread)
+void RTOS_taskTerminate(RTOS_task_t* pTask)
 {
 
-	if(pThread == NULL)
+	if(pTask == NULL)
 	{
-		pThread = pRunningThread;
+		pTask = pRunningTask;
 	}
 	else
 	{
 
 	}
 
-	/* Remove the threads items from any lists */
-	if(pThread->listItem.pList != NULL)
+	/* Remove the tasks items from any lists */
+	if(pTask->listItem.pList != NULL)
 	{
-		RTOS_listRemove(& pThread->listItem);
+		RTOS_listRemove(& pTask->listItem);
 	}
 	else
 	{
@@ -348,20 +348,20 @@ void RTOS_threadTerminate(RTOS_thread_t* pThread)
 	}
 
 
-	if(pThread->eventListItem.pList != NULL)
+	if(pTask->eventListItem.pList != NULL)
 	{
-		RTOS_listRemove(& pThread->eventListItem);
+		RTOS_listRemove(& pTask->eventListItem);
 	}
 	else
 	{
 
 	}
 
-	/* Set the thread as terminated */
-	pThread->threadState = RTOS_THREADTERMINATED;
+	/* Set the task as terminated */
+	pTask->taskState = RTOS_TASKTERMINATED;
 
-	/* If the thread is the current running thread */
-	if(pThread == pRunningThread)
+	/* If the task is the current running task */
+	if(pTask == pRunningTask)
 	{
 		/* Invoke a pendSV exception */
 	    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;

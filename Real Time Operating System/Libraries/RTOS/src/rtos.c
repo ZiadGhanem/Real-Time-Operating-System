@@ -5,9 +5,9 @@
  *      Author: ziadyasser
  */
 
+#include <rtos_task.h>
 #include "rtos.h"
 #include "rtos_list.h"
-#include "rtos_thread.h"
 #include "rtos_scheduler.h"
 #include "rtos_semaphore.h"
 #include "rtos_mutex.h"
@@ -50,7 +50,7 @@ void RTOS_init(void)
 	NVIC_EnableIRQ(PendSV_IRQn);
 
 	/* Initialize ready lists */
-	RTOS_threadListsInit();
+	RTOS_taskListsInit();
 
 	/* Disable all interrupts except SVC */
 	__set_BASEPRI(1);
@@ -85,20 +85,20 @@ void RTOS_SVC_Handler_Main(uint32_t* svc_args)
 			RTOS_schedulerStart();
 			break;
 		case 1:
-			/* Create a thread */
-			RTOS_threadCreate((RTOS_thread_t*)svc_args[0],
+			/* Create a task */
+			RTOS_taskCreate((RTOS_task_t*)svc_args[0],
 							(RTOS_stack_t*)svc_args[1],
 							(uint32_t) svc_args[2],
 							(void *)svc_args[3],
 							(uint32_t) svc_args[8]);
 			break;
 		case 2:
-			/* Delay a thread by blocking it for a specific time delay */
-			RTOS_threadDelay((uint32_t) svc_args[0]);
+			/* Delay a task by blocking it for a specific time delay */
+			RTOS_taskDelay((uint32_t) svc_args[0]);
 			break;
 		case 3:
-			/* Remove a thread from the system */
-			RTOS_threadTerminate((RTOS_thread_t*) svc_args[0]);
+			/* Remove a task from the system */
+			RTOS_taskTerminate((RTOS_task_t*) svc_args[0]);
 			break;
 		/* Semaphore */
 		case 4:

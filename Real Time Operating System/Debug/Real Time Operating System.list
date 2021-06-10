@@ -31,13 +31,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
  13 .debug_ranges 00000428  00000000  00000000  0002b7f0  2**3
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_line   00002caf  00000000  00000000  0002bc18  2**0
+ 14 .debug_line   00002ca1  00000000  00000000  0002bc18  2**0
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_str    00001ff2  00000000  00000000  0002e8c7  2**0
+ 15 .debug_str    00001fbc  00000000  00000000  0002e8b9  2**0
                   CONTENTS, READONLY, DEBUGGING
- 16 .comment      0000007c  00000000  00000000  000308b9  2**0
+ 16 .comment      0000007c  00000000  00000000  00030875  2**0
                   CONTENTS, READONLY
- 17 .debug_frame  00001224  00000000  00000000  00030938  2**2
+ 17 .debug_frame  00001224  00000000  00000000  000308f4  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -101,11 +101,11 @@ Disassembly of section .text:
 
  .type RTOS_PendSV_Handler, %function
  RTOS_PendSV_Handler:
- 	/****************** Saving the current thread's context ********************/
+ 	/****************** Saving the current task's context ********************/
  	/* Get PSP */
  	MRS R1, PSP
  800020c:	f3ef 8109 	mrs	r1, PSP
-	/* Check if the currently running thread uses FPU
+	/* Check if the currently running task uses FPU
 	 * If so so push FPU registers (s16 - s32)
 	**/
 	TST LR, 0x10	/* Test bit 5 in LR, if it is zero then FPU is enabled */
@@ -123,37 +123,37 @@ Disassembly of section .text:
 	/* Instruction Synchronization Barrier */
 	ISB
  8000220:	f3bf 8f6f 	isb	sy
-	/* Push {R2 -> R11} into the thread's stack*/
+	/* Push {R2 -> R11} into the task's stack*/
 	STMDB R1!, {R2-R11}
  8000224:	e921 0ffc 	stmdb	r1!, {r2, r3, r4, r5, r6, r7, r8, r9, sl, fp}
-	/* Save the thread's stack pointer */
-	BL RTOS_threadGetRunning
- 8000228:	f000 fef8 	bl	800101c <RTOS_threadGetRunning>
+	/* Save the task's stack pointer */
+	BL RTOS_taskGetRunning
+ 8000228:	f000 fef8 	bl	800101c <RTOS_taskGetRunning>
 	STR R1, [R0]
  800022c:	6001      	str	r1, [r0, #0]
 
-	/****************** Switch threads ********************/
+	/****************** Switch tasks ********************/
 	/* Disable all interrupts excepts SVC as PendSV can be interrupted */
 	MOV R0, #1
  800022e:	f04f 0001 	mov.w	r0, #1
 	MSR BASEPRI, R1
  8000232:	f381 8811 	msr	BASEPRI, r1
- 	/* Get the next thread */
- 	BL RTOS_threadSwitch
- 8000236:	f000 ff59 	bl	80010ec <RTOS_threadSwitch>
+ 	/* Get the next task */
+ 	BL RTOS_taskSwitch
+ 8000236:	f000 ff59 	bl	80010ec <RTOS_taskSwitch>
  	/* Enable all interrupts */
 	MOV R0, #0
  800023a:	f04f 0000 	mov.w	r0, #0
 	MSR BASEPRI, R0
  800023e:	f380 8811 	msr	BASEPRI, r0
- 	/* Set the process stack pointer to the thread's stack */
- 	BL RTOS_threadGetRunning
- 8000242:	f000 feeb 	bl	800101c <RTOS_threadGetRunning>
+ 	/* Set the process stack pointer to the task's stack */
+ 	BL RTOS_taskGetRunning
+ 8000242:	f000 feeb 	bl	800101c <RTOS_taskGetRunning>
 
-	/****************** Restoring the next thread's context ********************/
+	/****************** Restoring the next task's context ********************/
  	LDR R1, [R0]
  8000246:	6801      	ldr	r1, [r0, #0]
- 	/* POP {R2 -> R11} from the thread's stack*/
+ 	/* POP {R2 -> R11} from the task's stack*/
  	LDMIA R1!, {R2-R11}
  8000248:	e8b1 0ffc 	ldmia.w	r1!, {r2, r3, r4, r5, r6, r7, r8, r9, sl, fp}
  	/* Move R3 into CONTROL */
@@ -165,7 +165,7 @@ Disassembly of section .text:
  	/* MOVE R2 into Link Register */
  	MOV LR, R2
  8000254:	4696      	mov	lr, r2
- 	/* Check if the currently running thread uses FPU
+ 	/* Check if the currently running task uses FPU
 	 * If so so pop FPU registers (s16 - s32)
 	**/
 	TST LR, 0x10	/* Test bit 5 in LR, if it is zero then FPU is enabled */
@@ -195,28 +195,28 @@ Disassembly of section .text:
 	BX LR
  800026e:	4770      	bx	lr
 
-08000270 <RTOS_SVC_threadCreate>:
+08000270 <RTOS_SVC_taskCreate>:
 
- .type RTOS_SVC_threadCreate, %function
- RTOS_SVC_threadCreate:
+ .type RTOS_SVC_taskCreate, %function
+ RTOS_SVC_taskCreate:
 	SVC 1
  8000270:	df01      	svc	1
 	BX LR
  8000272:	4770      	bx	lr
 
-08000274 <RTOS_SVC_threadDelay>:
+08000274 <RTOS_SVC_taskDelay>:
 
- .type RTOS_SVC_threadDelay, %function
- RTOS_SVC_threadDelay:
+ .type RTOS_SVC_taskDelay, %function
+ RTOS_SVC_taskDelay:
  	SVC 2
  8000274:	df02      	svc	2
  	BX LR
  8000276:	4770      	bx	lr
 
-08000278 <RTOS_SVC_threadTerminate>:
+08000278 <RTOS_SVC_taskTerminate>:
 
- .type RTOS_SVC_threadTerminate, %function
- RTOS_SVC_threadTerminate:
+ .type RTOS_SVC_taskTerminate, %function
+ RTOS_SVC_taskTerminate:
  	SVC 3
  8000278:	df03      	svc	3
  	BX LR
@@ -588,8 +588,8 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __disable_irq(void)
  800042c:	f7ff ff62 	bl	80002f4 <NVIC_EnableIRQ>
 
 	/* Initialize ready lists */
-	RTOS_threadListsInit();
- 8000430:	f000 fcf6 	bl	8000e20 <RTOS_threadListsInit>
+	RTOS_taskListsInit();
+ 8000430:	f000 fcf6 	bl	8000e20 <RTOS_taskListsInit>
  8000434:	2301      	movs	r3, #1
  8000436:	607b      	str	r3, [r7, #4]
 
@@ -671,8 +671,8 @@ void RTOS_SVC_Handler_Main(uint32_t* svc_args)
 			break;
  80004bc:	e0a8      	b.n	8000610 <RTOS_SVC_Handler_Main+0x1bc>
 		case 1:
-			/* Create a thread */
-			RTOS_threadCreate((RTOS_thread_t*)svc_args[0],
+			/* Create a task */
+			RTOS_taskCreate((RTOS_task_t*)svc_args[0],
  80004be:	687b      	ldr	r3, [r7, #4]
  80004c0:	681b      	ldr	r3, [r3, #0]
  80004c2:	4618      	mov	r0, r3
@@ -680,45 +680,45 @@ void RTOS_SVC_Handler_Main(uint32_t* svc_args)
  80004c4:	687b      	ldr	r3, [r7, #4]
  80004c6:	3304      	adds	r3, #4
  80004c8:	681b      	ldr	r3, [r3, #0]
-			RTOS_threadCreate((RTOS_thread_t*)svc_args[0],
+			RTOS_taskCreate((RTOS_task_t*)svc_args[0],
  80004ca:	4619      	mov	r1, r3
 							(uint32_t) svc_args[2],
  80004cc:	687b      	ldr	r3, [r7, #4]
  80004ce:	3308      	adds	r3, #8
-			RTOS_threadCreate((RTOS_thread_t*)svc_args[0],
+			RTOS_taskCreate((RTOS_task_t*)svc_args[0],
  80004d0:	681a      	ldr	r2, [r3, #0]
 							(void *)svc_args[3],
  80004d2:	687b      	ldr	r3, [r7, #4]
  80004d4:	330c      	adds	r3, #12
  80004d6:	681b      	ldr	r3, [r3, #0]
-			RTOS_threadCreate((RTOS_thread_t*)svc_args[0],
+			RTOS_taskCreate((RTOS_task_t*)svc_args[0],
  80004d8:	461c      	mov	r4, r3
 							(uint32_t) svc_args[8]);
  80004da:	687b      	ldr	r3, [r7, #4]
  80004dc:	3320      	adds	r3, #32
-			RTOS_threadCreate((RTOS_thread_t*)svc_args[0],
+			RTOS_taskCreate((RTOS_task_t*)svc_args[0],
  80004de:	681b      	ldr	r3, [r3, #0]
  80004e0:	9300      	str	r3, [sp, #0]
  80004e2:	4623      	mov	r3, r4
- 80004e4:	f000 fcba 	bl	8000e5c <RTOS_threadCreate>
+ 80004e4:	f000 fcba 	bl	8000e5c <RTOS_taskCreate>
 			break;
  80004e8:	e092      	b.n	8000610 <RTOS_SVC_Handler_Main+0x1bc>
 		case 2:
-			/* Delay a thread by blocking it for a specific time delay */
-			RTOS_threadDelay((uint32_t) svc_args[0]);
+			/* Delay a task by blocking it for a specific time delay */
+			RTOS_taskDelay((uint32_t) svc_args[0]);
  80004ea:	687b      	ldr	r3, [r7, #4]
  80004ec:	681b      	ldr	r3, [r3, #0]
  80004ee:	4618      	mov	r0, r3
- 80004f0:	f000 fe58 	bl	80011a4 <RTOS_threadDelay>
+ 80004f0:	f000 fe58 	bl	80011a4 <RTOS_taskDelay>
 			break;
  80004f4:	e08c      	b.n	8000610 <RTOS_SVC_Handler_Main+0x1bc>
 		case 3:
-			/* Remove a thread from the system */
-			RTOS_threadTerminate((RTOS_thread_t*) svc_args[0]);
+			/* Remove a task from the system */
+			RTOS_taskTerminate((RTOS_task_t*) svc_args[0]);
  80004f6:	687b      	ldr	r3, [r7, #4]
  80004f8:	681b      	ldr	r3, [r3, #0]
  80004fa:	4618      	mov	r0, r3
- 80004fc:	f000 fe92 	bl	8001224 <RTOS_threadTerminate>
+ 80004fc:	f000 fe92 	bl	8001224 <RTOS_taskTerminate>
 			break;
  8000500:	e086      	b.n	8000610 <RTOS_SVC_Handler_Main+0x1bc>
 		/* Semaphore */
@@ -1179,9 +1179,9 @@ void RTOS_listInsert(RTOS_list_t* pList, RTOS_listItem_t* pListItem)
  8000780:	60fb      	str	r3, [r7, #12]
 	 * Lazy evaluation prevents the second condition from being
 	 * tested in case the next item was the end item as it doesn't
-	 * have pThread
+	 * have pTask
 	 */
-	 /* Not less than or equal so the thread waiting the most gets executed first */
+	 /* Not less than or equal so the task waiting the most gets executed first */
 	while((pCurrentItem->pNext != (RTOS_listItem_t*) &pList->endItem) &&
  8000782:	e002      	b.n	800078a <RTOS_listInsert+0x2c>
 	(pListItem->orderValue < pCurrentItem->pNext->orderValue))
@@ -1736,24 +1736,24 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __STREXW(uint32_t va
  8000a70:	2b00      	cmp	r3, #0
  8000a72:	d023      	beq.n	8000abc <RTOS_mutexLock+0xc0>
 	{
-		/* Get the currently running thread */
-		RTOS_thread_t* pThread = RTOS_threadGetRunning();
- 8000a74:	f000 fad2 	bl	800101c <RTOS_threadGetRunning>
+		/* Get the currently running task */
+		RTOS_task_t* pTask = RTOS_taskGetRunning();
+ 8000a74:	f000 fad2 	bl	800101c <RTOS_taskGetRunning>
  8000a78:	61f8      	str	r0, [r7, #28]
-		/* Remove the thread from the ready list */
-		RTOS_listRemove(& pThread->listItem);
+		/* Remove the task from the ready list */
+		RTOS_listRemove(& pTask->listItem);
  8000a7a:	69fb      	ldr	r3, [r7, #28]
  8000a7c:	3308      	adds	r3, #8
  8000a7e:	4618      	mov	r0, r3
  8000a80:	f7ff feac 	bl	80007dc <RTOS_listRemove>
 		/* Set the items ordering value for the mutex list */
-		pThread->eventListItem.orderValue = pThread->priority;
+		pTask->eventListItem.orderValue = pTask->priority;
  8000a84:	69fb      	ldr	r3, [r7, #28]
  8000a86:	685a      	ldr	r2, [r3, #4]
  8000a88:	69fb      	ldr	r3, [r7, #28]
  8000a8a:	62da      	str	r2, [r3, #44]	; 0x2c
-		/* Add the thread to the mutex list */
-		RTOS_listInsert(&pMutex->mutexList, & pThread->eventListItem);
+		/* Add the task to the mutex list */
+		RTOS_listInsert(&pMutex->mutexList, & pTask->eventListItem);
  8000a8c:	687a      	ldr	r2, [r7, #4]
  8000a8e:	69fb      	ldr	r3, [r7, #28]
  8000a90:	331c      	adds	r3, #28
@@ -1766,11 +1766,11 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE uint32_t __STREXW(uint32_t va
  8000a9c:	f1b3 3fff 	cmp.w	r3, #4294967295	; 0xffffffff
  8000aa0:	d003      	beq.n	8000aaa <RTOS_mutexLock+0xae>
 		{
-			/* Add the thread to timer's list */
-			RTOS_threadAddToTimerList(pThread, waitTicks);
+			/* Add the task to timer's list */
+			RTOS_taskAddToTimerList(pTask, waitTicks);
  8000aa2:	6839      	ldr	r1, [r7, #0]
  8000aa4:	69f8      	ldr	r0, [r7, #28]
- 8000aa6:	f000 fb01 	bl	80010ac <RTOS_threadAddToTimerList>
+ 8000aa6:	f000 fb01 	bl	80010ac <RTOS_taskAddToTimerList>
 		}
 		else
 		{
@@ -1819,32 +1819,32 @@ void RTOS_mutexUnlock(RTOS_mutex_t* pMutex)
  8000ad8:	687b      	ldr	r3, [r7, #4]
  8000ada:	2201      	movs	r2, #1
  8000adc:	611a      	str	r2, [r3, #16]
-	/* Check if any threads are blocked */
+	/* Check if any tasks are blocked */
 	if(pMutex->mutexList.numListItems > 0)
  8000ade:	687b      	ldr	r3, [r7, #4]
  8000ae0:	68db      	ldr	r3, [r3, #12]
  8000ae2:	2b00      	cmp	r3, #0
  8000ae4:	d014      	beq.n	8000b10 <RTOS_mutexUnlock+0x44>
 	{
-		/* Remove a thread from the mutex list */
-		RTOS_thread_t* pThread = pMutex->mutexList.endItem.pPrev->pThread;
+		/* Remove a task from the mutex list */
+		RTOS_task_t* pTask = pMutex->mutexList.endItem.pPrev->pTask;
  8000ae6:	687b      	ldr	r3, [r7, #4]
  8000ae8:	689b      	ldr	r3, [r3, #8]
  8000aea:	68db      	ldr	r3, [r3, #12]
  8000aec:	60fb      	str	r3, [r7, #12]
-		RTOS_listRemove(& pThread->eventListItem);
+		RTOS_listRemove(& pTask->eventListItem);
  8000aee:	68fb      	ldr	r3, [r7, #12]
  8000af0:	331c      	adds	r3, #28
  8000af2:	4618      	mov	r0, r3
  8000af4:	f7ff fe72 	bl	80007dc <RTOS_listRemove>
-		/* Check if the thread was delayed then remove it from delay list */
-		if(pThread->listItem.pList != NULL)
+		/* Check if the task was delayed then remove it from delay list */
+		if(pTask->listItem.pList != NULL)
  8000af8:	68fb      	ldr	r3, [r7, #12]
  8000afa:	691b      	ldr	r3, [r3, #16]
  8000afc:	2b00      	cmp	r3, #0
  8000afe:	d004      	beq.n	8000b0a <RTOS_mutexUnlock+0x3e>
 		{
-			RTOS_listRemove(& pThread->listItem);
+			RTOS_listRemove(& pTask->listItem);
  8000b00:	68fb      	ldr	r3, [r7, #12]
  8000b02:	3308      	adds	r3, #8
  8000b04:	4618      	mov	r0, r3
@@ -1853,10 +1853,10 @@ void RTOS_mutexUnlock(RTOS_mutex_t* pMutex)
 		{
 
 		}
-		/* Place this thread in the ready list */
-		RTOS_threadAddToReadyList(pThread);
+		/* Place this task in the ready list */
+		RTOS_taskAddToReadyList(pTask);
  8000b0a:	68f8      	ldr	r0, [r7, #12]
- 8000b0c:	f000 fa92 	bl	8001034 <RTOS_threadAddToReadyList>
+ 8000b0c:	f000 fa92 	bl	8001034 <RTOS_taskAddToReadyList>
 	}
 	else
 	{
@@ -1868,17 +1868,17 @@ void RTOS_mutexUnlock(RTOS_mutex_t* pMutex)
  8000b14:	46bd      	mov	sp, r7
  8000b16:	bd80      	pop	{r7, pc}
 
-08000b18 <RTOS_idleThreadFunc>:
+08000b18 <RTOS_idleTaskFunc>:
  * 	None
  * Return:
  * 	None
  */
-static void RTOS_idleThreadFunc(void)
+static void RTOS_idleTaskFunc(void)
 {
  8000b18:	b480      	push	{r7}
  8000b1a:	af00      	add	r7, sp, #0
 	while(1);
- 8000b1c:	e7fe      	b.n	8000b1c <RTOS_idleThreadFunc+0x4>
+ 8000b1c:	e7fe      	b.n	8000b1c <RTOS_idleTaskFunc+0x4>
 	...
 
 08000b20 <RTOS_schedulerStart>:
@@ -1891,27 +1891,27 @@ void RTOS_schedulerStart(void)
  8000b20:	b580      	push	{r7, lr}
  8000b22:	b086      	sub	sp, #24
  8000b24:	af02      	add	r7, sp, #8
-	/* Create the idle thread */
-	RTOS_threadCreate(&RTOS_idleThread, RTOS_idleThreadStack, IDLE_THREAD_STACK_SIZE, RTOS_idleThreadFunc, MAX_PRIORITY_LEVEL - 1);
+	/* Create the idle task */
+	RTOS_taskCreate(&RTOS_idleTask, RTOS_idleTaskStack, IDLE_TASK_STACK_SIZE, RTOS_idleTaskFunc, MAX_PRIORITY_LEVEL - 1);
  8000b26:	230f      	movs	r3, #15
  8000b28:	9300      	str	r3, [sp, #0]
  8000b2a:	4b17      	ldr	r3, [pc, #92]	; (8000b88 <RTOS_schedulerStart+0x68>)
  8000b2c:	f44f 7200 	mov.w	r2, #512	; 0x200
  8000b30:	4916      	ldr	r1, [pc, #88]	; (8000b8c <RTOS_schedulerStart+0x6c>)
  8000b32:	4817      	ldr	r0, [pc, #92]	; (8000b90 <RTOS_schedulerStart+0x70>)
- 8000b34:	f000 f992 	bl	8000e5c <RTOS_threadCreate>
+ 8000b34:	f000 f992 	bl	8000e5c <RTOS_taskCreate>
 
-	/* Switch to the top priority ready thread */
-	RTOS_threadSwitch();
- 8000b38:	f000 fad8 	bl	80010ec <RTOS_threadSwitch>
+	/* Switch to the top priority ready task */
+	RTOS_taskSwitch();
+ 8000b38:	f000 fad8 	bl	80010ec <RTOS_taskSwitch>
 
-	/* Get the new ready thread */
-	RTOS_thread_t* pNewRunningThread = RTOS_threadGetRunning();
- 8000b3c:	f000 fa6e 	bl	800101c <RTOS_threadGetRunning>
+	/* Get the new ready task */
+	RTOS_task_t* pNewRunningTask = RTOS_taskGetRunning();
+ 8000b3c:	f000 fa6e 	bl	800101c <RTOS_taskGetRunning>
  8000b40:	60f8      	str	r0, [r7, #12]
 
 	/* Set the exception return value */
-	RTOS_SVC_excReturn = MEM32WORD(pNewRunningThread->pStack);
+	RTOS_SVC_excReturn = MEM32WORD(pNewRunningTask->pStack);
  8000b42:	68fb      	ldr	r3, [r7, #12]
  8000b44:	681b      	ldr	r3, [r3, #0]
  8000b46:	681b      	ldr	r3, [r3, #0]
@@ -1919,7 +1919,7 @@ void RTOS_schedulerStart(void)
  8000b4a:	6013      	str	r3, [r2, #0]
 
 	/* Set the Process Stack Pointer */
-	__set_PSP(pNewRunningThread->pStack + 10 * 4);
+	__set_PSP(pNewRunningTask->pStack + 10 * 4);
  8000b4c:	68fb      	ldr	r3, [r7, #12]
  8000b4e:	681b      	ldr	r3, [r3, #0]
  8000b50:	3328      	adds	r3, #40	; 0x28
@@ -1929,7 +1929,7 @@ void RTOS_schedulerStart(void)
  8000b56:	f383 8809 	msr	PSP, r3
 
 	/* Set the control register */
-	__set_CONTROL(MEM32WORD(pNewRunningThread->pStack + (1 << 2)));
+	__set_CONTROL(MEM32WORD(pNewRunningTask->pStack + (1 << 2)));
  8000b5a:	68fb      	ldr	r3, [r7, #12]
  8000b5c:	681b      	ldr	r3, [r3, #0]
  8000b5e:	3304      	adds	r3, #4
@@ -1979,9 +1979,9 @@ void RTOS_SysTick_Handler(void)
 {
  8000b9c:	b580      	push	{r7, lr}
  8000b9e:	af00      	add	r7, sp, #0
- 	/* Check for delayed threads to be unblocked */
- 	RTOS_threadDelayCheck();
- 8000ba0:	f000 fb20 	bl	80011e4 <RTOS_threadDelayCheck>
+ 	/* Check for delayed tasks to be unblocked */
+ 	RTOS_taskDelayCheck();
+ 8000ba0:	f000 fb20 	bl	80011e4 <RTOS_taskDelayCheck>
 
 	/* Invoke a pendSV exception */
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
@@ -2159,24 +2159,24 @@ RTOS_returnStatus RTOS_semaphoreWait(RTOS_semaphore_t* pSemaphore, uint32_t wait
  8000c82:	2b00      	cmp	r3, #0
  8000c84:	d023      	beq.n	8000cce <RTOS_semaphoreWait+0xc2>
 	{
-		/* Get the currently running thread */
-		RTOS_thread_t* pThread = RTOS_threadGetRunning();
- 8000c86:	f000 f9c9 	bl	800101c <RTOS_threadGetRunning>
+		/* Get the currently running task */
+		RTOS_task_t* pTask = RTOS_taskGetRunning();
+ 8000c86:	f000 f9c9 	bl	800101c <RTOS_taskGetRunning>
  8000c8a:	61f8      	str	r0, [r7, #28]
-		/* Remove the thread from the ready list */
-		RTOS_listRemove(& pThread->listItem);
+		/* Remove the task from the ready list */
+		RTOS_listRemove(& pTask->listItem);
  8000c8c:	69fb      	ldr	r3, [r7, #28]
  8000c8e:	3308      	adds	r3, #8
  8000c90:	4618      	mov	r0, r3
  8000c92:	f7ff fda3 	bl	80007dc <RTOS_listRemove>
 		/* Set the items ordering value for the semaphores list */
-		pThread->eventListItem.orderValue = pThread->priority;
+		pTask->eventListItem.orderValue = pTask->priority;
  8000c96:	69fb      	ldr	r3, [r7, #28]
  8000c98:	685a      	ldr	r2, [r3, #4]
  8000c9a:	69fb      	ldr	r3, [r7, #28]
  8000c9c:	62da      	str	r2, [r3, #44]	; 0x2c
-		/* Add the thread to the semaphores list */
-		RTOS_listInsert(&pSemaphore->semaphoreList, & pThread->eventListItem);
+		/* Add the task to the semaphores list */
+		RTOS_listInsert(&pSemaphore->semaphoreList, & pTask->eventListItem);
  8000c9e:	687a      	ldr	r2, [r7, #4]
  8000ca0:	69fb      	ldr	r3, [r7, #28]
  8000ca2:	331c      	adds	r3, #28
@@ -2184,16 +2184,16 @@ RTOS_returnStatus RTOS_semaphoreWait(RTOS_semaphore_t* pSemaphore, uint32_t wait
  8000ca6:	4610      	mov	r0, r2
  8000ca8:	f7ff fd59 	bl	800075e <RTOS_listInsert>
 
-		/* Add the thread to timer's list */
+		/* Add the task to timer's list */
 		if(waitTicks != RTOS_WAITFOREVER)
  8000cac:	683b      	ldr	r3, [r7, #0]
  8000cae:	f1b3 3fff 	cmp.w	r3, #4294967295	; 0xffffffff
  8000cb2:	d003      	beq.n	8000cbc <RTOS_semaphoreWait+0xb0>
 		{
-			RTOS_threadAddToTimerList(pThread, waitTicks);
+			RTOS_taskAddToTimerList(pTask, waitTicks);
  8000cb4:	6839      	ldr	r1, [r7, #0]
  8000cb6:	69f8      	ldr	r0, [r7, #28]
- 8000cb8:	f000 f9f8 	bl	80010ac <RTOS_threadAddToTimerList>
+ 8000cb8:	f000 f9f8 	bl	80010ac <RTOS_taskAddToTimerList>
 		}
 		else
 		{
@@ -2278,32 +2278,32 @@ void RTOS_semaphoreSignal(RTOS_semaphore_t* pSemaphore)
 	/* Data Memory Barrier */
 	__DMB();
 
-	/* Check if any threads are blocked */
+	/* Check if any tasks are blocked */
 	if(pSemaphore->semaphoreList.numListItems > 0)
  8000d1e:	687b      	ldr	r3, [r7, #4]
  8000d20:	68db      	ldr	r3, [r3, #12]
  8000d22:	2b00      	cmp	r3, #0
  8000d24:	d014      	beq.n	8000d50 <RTOS_semaphoreSignal+0x70>
 	{
-		/* Remove a thread from the semaphore list */
-		RTOS_thread_t* pThread = pSemaphore->semaphoreList.endItem.pPrev->pThread;
+		/* Remove a task from the semaphore list */
+		RTOS_task_t* pTask = pSemaphore->semaphoreList.endItem.pPrev->pTask;
  8000d26:	687b      	ldr	r3, [r7, #4]
  8000d28:	689b      	ldr	r3, [r3, #8]
  8000d2a:	68db      	ldr	r3, [r3, #12]
  8000d2c:	623b      	str	r3, [r7, #32]
-		RTOS_listRemove(& pThread->eventListItem);
+		RTOS_listRemove(& pTask->eventListItem);
  8000d2e:	6a3b      	ldr	r3, [r7, #32]
  8000d30:	331c      	adds	r3, #28
  8000d32:	4618      	mov	r0, r3
  8000d34:	f7ff fd52 	bl	80007dc <RTOS_listRemove>
-		/* Check if the thread was delayed then remove it from delay list */
-		if(pThread->listItem.pList != NULL)
+		/* Check if the task was delayed then remove it from delay list */
+		if(pTask->listItem.pList != NULL)
  8000d38:	6a3b      	ldr	r3, [r7, #32]
  8000d3a:	691b      	ldr	r3, [r3, #16]
  8000d3c:	2b00      	cmp	r3, #0
  8000d3e:	d004      	beq.n	8000d4a <RTOS_semaphoreSignal+0x6a>
 		{
-			RTOS_listRemove(& pThread->listItem);
+			RTOS_listRemove(& pTask->listItem);
  8000d40:	6a3b      	ldr	r3, [r7, #32]
  8000d42:	3308      	adds	r3, #8
  8000d44:	4618      	mov	r0, r3
@@ -2312,10 +2312,10 @@ void RTOS_semaphoreSignal(RTOS_semaphore_t* pSemaphore)
 		{
 
 		}
-		/* Place this thread in the ready list */
-		RTOS_threadAddToReadyList(pThread);
+		/* Place this task in the ready list */
+		RTOS_taskAddToReadyList(pTask);
  8000d4a:	6a38      	ldr	r0, [r7, #32]
- 8000d4c:	f000 f972 	bl	8001034 <RTOS_threadAddToReadyList>
+ 8000d4c:	f000 f972 	bl	8001034 <RTOS_taskAddToReadyList>
 	}
 	else
 	{
@@ -2487,12 +2487,12 @@ void RTOS_spinUnlock(RTOS_spinLock_t* pSpinLock)
  8000e1a:	f85d 7b04 	ldr.w	r7, [sp], #4
  8000e1e:	4770      	bx	lr
 
-08000e20 <RTOS_threadListsInit>:
+08000e20 <RTOS_taskListsInit>:
  *  None
  * Return:
  * 	None
  */
-void RTOS_threadListsInit(void)
+void RTOS_taskListsInit(void)
 {
  8000e20:	b580      	push	{r7, lr}
  8000e22:	b082      	sub	sp, #8
@@ -2502,11 +2502,11 @@ void RTOS_threadListsInit(void)
 	for(i = 0; i < MAX_PRIORITY_LEVEL; i++)
  8000e26:	2300      	movs	r3, #0
  8000e28:	607b      	str	r3, [r7, #4]
- 8000e2a:	e009      	b.n	8000e40 <RTOS_threadListsInit+0x20>
+ 8000e2a:	e009      	b.n	8000e40 <RTOS_taskListsInit+0x20>
 		RTOS_listInit(&RTOS_readyList[i]);
  8000e2c:	687b      	ldr	r3, [r7, #4]
  8000e2e:	011b      	lsls	r3, r3, #4
- 8000e30:	4a08      	ldr	r2, [pc, #32]	; (8000e54 <RTOS_threadListsInit+0x34>)
+ 8000e30:	4a08      	ldr	r2, [pc, #32]	; (8000e54 <RTOS_taskListsInit+0x34>)
  8000e32:	4413      	add	r3, r2
  8000e34:	4618      	mov	r0, r3
  8000e36:	f7ff fc43 	bl	80006c0 <RTOS_listInit>
@@ -2516,11 +2516,11 @@ void RTOS_threadListsInit(void)
  8000e3e:	607b      	str	r3, [r7, #4]
  8000e40:	687b      	ldr	r3, [r7, #4]
  8000e42:	2b0f      	cmp	r3, #15
- 8000e44:	d9f2      	bls.n	8000e2c <RTOS_threadListsInit+0xc>
+ 8000e44:	d9f2      	bls.n	8000e2c <RTOS_taskListsInit+0xc>
 
 	/* Initialize the delayed list */
 	RTOS_listInit(&RTOS_delayList);
- 8000e46:	4804      	ldr	r0, [pc, #16]	; (8000e58 <RTOS_threadListsInit+0x38>)
+ 8000e46:	4804      	ldr	r0, [pc, #16]	; (8000e58 <RTOS_taskListsInit+0x38>)
  8000e48:	f7ff fc3a 	bl	80006c0 <RTOS_listInit>
 }
  8000e4c:	bf00      	nop
@@ -2530,12 +2530,12 @@ void RTOS_threadListsInit(void)
  8000e54:	2000107c 	.word	0x2000107c
  8000e58:	2000117c 	.word	0x2000117c
 
-08000e5c <RTOS_threadCreate>:
- * 	priority -> The thread priority level
+08000e5c <RTOS_taskCreate>:
+ * 	priority -> The task priority level
  * Return:
  * 	None
  */
-void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, uint32_t stackSize, void* pFunction, uint32_t priority)
+void RTOS_taskCreate(RTOS_task_t* pTask, RTOS_stack_t* pStack, uint32_t stackSize, void* pFunction, uint32_t priority)
 {
  8000e5c:	b580      	push	{r7, lr}
  8000e5e:	b084      	sub	sp, #16
@@ -2544,36 +2544,36 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, uint32_t st
  8000e64:	60b9      	str	r1, [r7, #8]
  8000e66:	607a      	str	r2, [r7, #4]
  8000e68:	603b      	str	r3, [r7, #0]
-	ASSERT(pThread != NULL);
+	ASSERT(pTask != NULL);
  8000e6a:	68fb      	ldr	r3, [r7, #12]
  8000e6c:	2b00      	cmp	r3, #0
- 8000e6e:	d101      	bne.n	8000e74 <RTOS_threadCreate+0x18>
+ 8000e6e:	d101      	bne.n	8000e74 <RTOS_taskCreate+0x18>
  8000e70:	b672      	cpsid	i
- 8000e72:	e7fe      	b.n	8000e72 <RTOS_threadCreate+0x16>
+ 8000e72:	e7fe      	b.n	8000e72 <RTOS_taskCreate+0x16>
 	ASSERT(pStack != NULL);
  8000e74:	68bb      	ldr	r3, [r7, #8]
  8000e76:	2b00      	cmp	r3, #0
- 8000e78:	d101      	bne.n	8000e7e <RTOS_threadCreate+0x22>
+ 8000e78:	d101      	bne.n	8000e7e <RTOS_taskCreate+0x22>
  8000e7a:	b672      	cpsid	i
- 8000e7c:	e7fe      	b.n	8000e7c <RTOS_threadCreate+0x20>
+ 8000e7c:	e7fe      	b.n	8000e7c <RTOS_taskCreate+0x20>
 	ASSERT(stackSize <= MAX_STACK_SIZE);
  8000e7e:	687b      	ldr	r3, [r7, #4]
  8000e80:	f5b3 6f80 	cmp.w	r3, #1024	; 0x400
- 8000e84:	d901      	bls.n	8000e8a <RTOS_threadCreate+0x2e>
+ 8000e84:	d901      	bls.n	8000e8a <RTOS_taskCreate+0x2e>
  8000e86:	b672      	cpsid	i
- 8000e88:	e7fe      	b.n	8000e88 <RTOS_threadCreate+0x2c>
+ 8000e88:	e7fe      	b.n	8000e88 <RTOS_taskCreate+0x2c>
 	ASSERT(pFunction != NULL);
  8000e8a:	683b      	ldr	r3, [r7, #0]
  8000e8c:	2b00      	cmp	r3, #0
- 8000e8e:	d101      	bne.n	8000e94 <RTOS_threadCreate+0x38>
+ 8000e8e:	d101      	bne.n	8000e94 <RTOS_taskCreate+0x38>
  8000e90:	b672      	cpsid	i
- 8000e92:	e7fe      	b.n	8000e92 <RTOS_threadCreate+0x36>
+ 8000e92:	e7fe      	b.n	8000e92 <RTOS_taskCreate+0x36>
 	ASSERT((priority < MAX_PRIORITY_LEVEL) && (priority >= 0));
  8000e94:	69bb      	ldr	r3, [r7, #24]
  8000e96:	2b0f      	cmp	r3, #15
- 8000e98:	d901      	bls.n	8000e9e <RTOS_threadCreate+0x42>
+ 8000e98:	d901      	bls.n	8000e9e <RTOS_taskCreate+0x42>
  8000e9a:	b672      	cpsid	i
- 8000e9c:	e7fe      	b.n	8000e9c <RTOS_threadCreate+0x40>
+ 8000e9c:	e7fe      	b.n	8000e9c <RTOS_taskCreate+0x40>
 	 * PC
 	 * xPSR
 	 */
@@ -2585,7 +2585,7 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, uint32_t st
  8000ea4:	607b      	str	r3, [r7, #4]
 
 	/* Initialize the stack pointer */
-	pThread->pStack = (uint32_t)pStack + stackSize * 8 - 18 * 4;
+	pTask->pStack = (uint32_t)pStack + stackSize * 8 - 18 * 4;
  8000ea6:	687b      	ldr	r3, [r7, #4]
  8000ea8:	00da      	lsls	r2, r3, #3
  8000eaa:	68bb      	ldr	r3, [r7, #8]
@@ -2595,91 +2595,91 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, uint32_t st
  8000eb4:	601a      	str	r2, [r3, #0]
 
 	/* For testing */
-	MEM32WORD(pThread->pStack + (2 << 2)) = 0x4;
+	MEM32WORD(pTask->pStack + (2 << 2)) = 0x4;
  8000eb6:	68fb      	ldr	r3, [r7, #12]
  8000eb8:	681b      	ldr	r3, [r3, #0]
  8000eba:	3308      	adds	r3, #8
  8000ebc:	461a      	mov	r2, r3
  8000ebe:	2304      	movs	r3, #4
  8000ec0:	6013      	str	r3, [r2, #0]
-	MEM32WORD(pThread->pStack + (3 << 2)) = 0x5;
+	MEM32WORD(pTask->pStack + (3 << 2)) = 0x5;
  8000ec2:	68fb      	ldr	r3, [r7, #12]
  8000ec4:	681b      	ldr	r3, [r3, #0]
  8000ec6:	330c      	adds	r3, #12
  8000ec8:	461a      	mov	r2, r3
  8000eca:	2305      	movs	r3, #5
  8000ecc:	6013      	str	r3, [r2, #0]
-	MEM32WORD(pThread->pStack + (4 << 2)) = 0x6;
+	MEM32WORD(pTask->pStack + (4 << 2)) = 0x6;
  8000ece:	68fb      	ldr	r3, [r7, #12]
  8000ed0:	681b      	ldr	r3, [r3, #0]
  8000ed2:	3310      	adds	r3, #16
  8000ed4:	461a      	mov	r2, r3
  8000ed6:	2306      	movs	r3, #6
  8000ed8:	6013      	str	r3, [r2, #0]
-	MEM32WORD(pThread->pStack + (5 << 2)) = 0x7;
+	MEM32WORD(pTask->pStack + (5 << 2)) = 0x7;
  8000eda:	68fb      	ldr	r3, [r7, #12]
  8000edc:	681b      	ldr	r3, [r3, #0]
  8000ede:	3314      	adds	r3, #20
  8000ee0:	461a      	mov	r2, r3
  8000ee2:	2307      	movs	r3, #7
  8000ee4:	6013      	str	r3, [r2, #0]
-	MEM32WORD(pThread->pStack + (6 << 2)) = 0x8;
+	MEM32WORD(pTask->pStack + (6 << 2)) = 0x8;
  8000ee6:	68fb      	ldr	r3, [r7, #12]
  8000ee8:	681b      	ldr	r3, [r3, #0]
  8000eea:	3318      	adds	r3, #24
  8000eec:	461a      	mov	r2, r3
  8000eee:	2308      	movs	r3, #8
  8000ef0:	6013      	str	r3, [r2, #0]
-	MEM32WORD(pThread->pStack + (7 << 2)) = 0x9;
+	MEM32WORD(pTask->pStack + (7 << 2)) = 0x9;
  8000ef2:	68fb      	ldr	r3, [r7, #12]
  8000ef4:	681b      	ldr	r3, [r3, #0]
  8000ef6:	331c      	adds	r3, #28
  8000ef8:	461a      	mov	r2, r3
  8000efa:	2309      	movs	r3, #9
  8000efc:	6013      	str	r3, [r2, #0]
-	MEM32WORD(pThread->pStack + (8 << 2)) = 0x10;
+	MEM32WORD(pTask->pStack + (8 << 2)) = 0x10;
  8000efe:	68fb      	ldr	r3, [r7, #12]
  8000f00:	681b      	ldr	r3, [r3, #0]
  8000f02:	3320      	adds	r3, #32
  8000f04:	461a      	mov	r2, r3
  8000f06:	2310      	movs	r3, #16
  8000f08:	6013      	str	r3, [r2, #0]
-	MEM32WORD(pThread->pStack + (9 << 2)) = 0x11;
+	MEM32WORD(pTask->pStack + (9 << 2)) = 0x11;
  8000f0a:	68fb      	ldr	r3, [r7, #12]
  8000f0c:	681b      	ldr	r3, [r3, #0]
  8000f0e:	3324      	adds	r3, #36	; 0x24
  8000f10:	461a      	mov	r2, r3
  8000f12:	2311      	movs	r3, #17
  8000f14:	6013      	str	r3, [r2, #0]
-	MEM32WORD(pThread->pStack + (10 << 2)) = 0x1;
+	MEM32WORD(pTask->pStack + (10 << 2)) = 0x1;
  8000f16:	68fb      	ldr	r3, [r7, #12]
  8000f18:	681b      	ldr	r3, [r3, #0]
  8000f1a:	3328      	adds	r3, #40	; 0x28
  8000f1c:	461a      	mov	r2, r3
  8000f1e:	2301      	movs	r3, #1
  8000f20:	6013      	str	r3, [r2, #0]
-	MEM32WORD(pThread->pStack + (11 << 2)) = 0x2;
+	MEM32WORD(pTask->pStack + (11 << 2)) = 0x2;
  8000f22:	68fb      	ldr	r3, [r7, #12]
  8000f24:	681b      	ldr	r3, [r3, #0]
  8000f26:	332c      	adds	r3, #44	; 0x2c
  8000f28:	461a      	mov	r2, r3
  8000f2a:	2302      	movs	r3, #2
  8000f2c:	6013      	str	r3, [r2, #0]
-	MEM32WORD(pThread->pStack + (12 << 2)) = 0x3;
+	MEM32WORD(pTask->pStack + (12 << 2)) = 0x3;
  8000f2e:	68fb      	ldr	r3, [r7, #12]
  8000f30:	681b      	ldr	r3, [r3, #0]
  8000f32:	3330      	adds	r3, #48	; 0x30
  8000f34:	461a      	mov	r2, r3
  8000f36:	2303      	movs	r3, #3
  8000f38:	6013      	str	r3, [r2, #0]
-	MEM32WORD(pThread->pStack + (13 << 2)) = 0x4;
+	MEM32WORD(pTask->pStack + (13 << 2)) = 0x4;
  8000f3a:	68fb      	ldr	r3, [r7, #12]
  8000f3c:	681b      	ldr	r3, [r3, #0]
  8000f3e:	3334      	adds	r3, #52	; 0x34
  8000f40:	461a      	mov	r2, r3
  8000f42:	2304      	movs	r3, #4
  8000f44:	6013      	str	r3, [r2, #0]
-	MEM32WORD(pThread->pStack + (14 << 2)) = 0x12;
+	MEM32WORD(pTask->pStack + (14 << 2)) = 0x12;
  8000f46:	68fb      	ldr	r3, [r7, #12]
  8000f48:	681b      	ldr	r3, [r3, #0]
  8000f4a:	3338      	adds	r3, #56	; 0x38
@@ -2687,8 +2687,8 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, uint32_t st
  8000f4e:	2312      	movs	r3, #18
  8000f50:	6013      	str	r3, [r2, #0]
 
-	/* Initialize EXC_RETURN (Return to thread mode using PSP) */
-	MEM32WORD(pThread->pStack) = 0xFFFFFFFDUL;
+	/* Initialize EXC_RETURN (Return to task mode using PSP) */
+	MEM32WORD(pTask->pStack) = 0xFFFFFFFDUL;
  8000f52:	68fb      	ldr	r3, [r7, #12]
  8000f54:	681b      	ldr	r3, [r3, #0]
  8000f56:	461a      	mov	r2, r3
@@ -2696,7 +2696,7 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, uint32_t st
  8000f5c:	6013      	str	r3, [r2, #0]
 
 	/* Initialize the CONTROL Register (No FPU, PSP, Unprivileged mode)*/
-	MEM32WORD(pThread->pStack + (1 << 2)) = 0x3;
+	MEM32WORD(pTask->pStack + (1 << 2)) = 0x3;
  8000f5e:	68fb      	ldr	r3, [r7, #12]
  8000f60:	681b      	ldr	r3, [r3, #0]
  8000f62:	3304      	adds	r3, #4
@@ -2705,7 +2705,7 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, uint32_t st
  8000f68:	6013      	str	r3, [r2, #0]
 
 	/* Initialize the program counter */
-	MEM32WORD(pThread->pStack + (16 << 2)) = (uint32_t)pFunction;
+	MEM32WORD(pTask->pStack + (16 << 2)) = (uint32_t)pFunction;
  8000f6a:	68fb      	ldr	r3, [r7, #12]
  8000f6c:	681b      	ldr	r3, [r3, #0]
  8000f6e:	3340      	adds	r3, #64	; 0x40
@@ -2714,7 +2714,7 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, uint32_t st
  8000f74:	6013      	str	r3, [r2, #0]
 
 	/* Initialize the xPSR register to only Thumb mode*/
-	MEM32WORD(pThread->pStack + (17 << 2)) = 0x01000000;
+	MEM32WORD(pTask->pStack + (17 << 2)) = 0x01000000;
  8000f76:	68fb      	ldr	r3, [r7, #12]
  8000f78:	681b      	ldr	r3, [r3, #0]
  8000f7a:	3344      	adds	r3, #68	; 0x44
@@ -2723,55 +2723,55 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, uint32_t st
  8000f82:	6013      	str	r3, [r2, #0]
 
 	/* Set the priority level */
-	pThread->priority = priority;
+	pTask->priority = priority;
  8000f84:	68fb      	ldr	r3, [r7, #12]
  8000f86:	69ba      	ldr	r2, [r7, #24]
  8000f88:	605a      	str	r2, [r3, #4]
 
-	/* Set thread ID */
-	pThread->threadId = numThreads;
- 8000f8a:	4b1f      	ldr	r3, [pc, #124]	; (8001008 <RTOS_threadCreate+0x1ac>)
+	/* Set task ID */
+	pTask->taskId = numTasks;
+ 8000f8a:	4b1f      	ldr	r3, [pc, #124]	; (8001008 <RTOS_taskCreate+0x1ac>)
  8000f8c:	681a      	ldr	r2, [r3, #0]
  8000f8e:	68fb      	ldr	r3, [r7, #12]
  8000f90:	631a      	str	r2, [r3, #48]	; 0x30
-	numThreads++;
- 8000f92:	4b1d      	ldr	r3, [pc, #116]	; (8001008 <RTOS_threadCreate+0x1ac>)
+	numTasks++;
+ 8000f92:	4b1d      	ldr	r3, [pc, #116]	; (8001008 <RTOS_taskCreate+0x1ac>)
  8000f94:	681b      	ldr	r3, [r3, #0]
  8000f96:	3301      	adds	r3, #1
- 8000f98:	4a1b      	ldr	r2, [pc, #108]	; (8001008 <RTOS_threadCreate+0x1ac>)
+ 8000f98:	4a1b      	ldr	r2, [pc, #108]	; (8001008 <RTOS_taskCreate+0x1ac>)
  8000f9a:	6013      	str	r3, [r2, #0]
 
-	/* Set the thread state to ready */
-	pThread->threadState = RTOS_THREADREADY;
+	/* Set the task state to ready */
+	pTask->taskState = RTOS_TASKREADY;
  8000f9c:	68fb      	ldr	r3, [r7, #12]
  8000f9e:	2201      	movs	r2, #1
  8000fa0:	f883 2034 	strb.w	r2, [r3, #52]	; 0x34
 
-	/* Set the thread's list item thread pointer */
-	pThread->listItem.pThread = pThread;
+	/* Set the task's list item task pointer */
+	pTask->listItem.pTask = pTask;
  8000fa4:	68fb      	ldr	r3, [r7, #12]
  8000fa6:	68fa      	ldr	r2, [r7, #12]
  8000fa8:	615a      	str	r2, [r3, #20]
-	pThread->eventListItem.pThread = pThread;
+	pTask->eventListItem.pTask = pTask;
  8000faa:	68fb      	ldr	r3, [r7, #12]
  8000fac:	68fa      	ldr	r2, [r7, #12]
  8000fae:	629a      	str	r2, [r3, #40]	; 0x28
 
-	/* Set the thread's list item to none */
-	pThread->listItem.pList = NULL;
+	/* Set the task's list item to none */
+	pTask->listItem.pList = NULL;
  8000fb0:	68fb      	ldr	r3, [r7, #12]
  8000fb2:	2200      	movs	r2, #0
  8000fb4:	611a      	str	r2, [r3, #16]
-	pThread->eventListItem.pList = NULL;
+	pTask->eventListItem.pList = NULL;
  8000fb6:	68fb      	ldr	r3, [r7, #12]
  8000fb8:	2200      	movs	r2, #0
  8000fba:	625a      	str	r2, [r3, #36]	; 0x24
 
-	/* Add the thread to the ready list */
-	RTOS_listInsertEnd(&RTOS_readyList[priority], &pThread->listItem);
+	/* Add the task to the ready list */
+	RTOS_listInsertEnd(&RTOS_readyList[priority], &pTask->listItem);
  8000fbc:	69bb      	ldr	r3, [r7, #24]
  8000fbe:	011b      	lsls	r3, r3, #4
- 8000fc0:	4a12      	ldr	r2, [pc, #72]	; (800100c <RTOS_threadCreate+0x1b0>)
+ 8000fc0:	4a12      	ldr	r2, [pc, #72]	; (800100c <RTOS_taskCreate+0x1b0>)
  8000fc2:	441a      	add	r2, r3
  8000fc4:	68fb      	ldr	r3, [r7, #12]
  8000fc6:	3308      	adds	r3, #8
@@ -2779,39 +2779,39 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, uint32_t st
  8000fca:	4610      	mov	r0, r2
  8000fcc:	f7ff fb96 	bl	80006fc <RTOS_listInsertEnd>
 
-	/* Check if the new thread has a new highest priority */
+	/* Check if the new task has a new highest priority */
 	if(priority < currentTopPriority)
- 8000fd0:	4b0f      	ldr	r3, [pc, #60]	; (8001010 <RTOS_threadCreate+0x1b4>)
+ 8000fd0:	4b0f      	ldr	r3, [pc, #60]	; (8001010 <RTOS_taskCreate+0x1b4>)
  8000fd2:	681b      	ldr	r3, [r3, #0]
  8000fd4:	69ba      	ldr	r2, [r7, #24]
  8000fd6:	429a      	cmp	r2, r3
- 8000fd8:	d202      	bcs.n	8000fe0 <RTOS_threadCreate+0x184>
+ 8000fd8:	d202      	bcs.n	8000fe0 <RTOS_taskCreate+0x184>
 	{
 		currentTopPriority = priority;
- 8000fda:	4a0d      	ldr	r2, [pc, #52]	; (8001010 <RTOS_threadCreate+0x1b4>)
+ 8000fda:	4a0d      	ldr	r2, [pc, #52]	; (8001010 <RTOS_taskCreate+0x1b4>)
  8000fdc:	69bb      	ldr	r3, [r7, #24]
  8000fde:	6013      	str	r3, [r2, #0]
 	{
 
 	}
 
-	/* Check if the scheduler has started and the currently running thread has a lower priority */
-	if((pRunningThread != NULL) && (priority < pRunningThread->priority))
- 8000fe0:	4b0c      	ldr	r3, [pc, #48]	; (8001014 <RTOS_threadCreate+0x1b8>)
+	/* Check if the scheduler has started and the currently running task has a lower priority */
+	if((pRunningTask != NULL) && (priority < pRunningTask->priority))
+ 8000fe0:	4b0c      	ldr	r3, [pc, #48]	; (8001014 <RTOS_taskCreate+0x1b8>)
  8000fe2:	681b      	ldr	r3, [r3, #0]
  8000fe4:	2b00      	cmp	r3, #0
- 8000fe6:	d00b      	beq.n	8001000 <RTOS_threadCreate+0x1a4>
- 8000fe8:	4b0a      	ldr	r3, [pc, #40]	; (8001014 <RTOS_threadCreate+0x1b8>)
+ 8000fe6:	d00b      	beq.n	8001000 <RTOS_taskCreate+0x1a4>
+ 8000fe8:	4b0a      	ldr	r3, [pc, #40]	; (8001014 <RTOS_taskCreate+0x1b8>)
  8000fea:	681b      	ldr	r3, [r3, #0]
  8000fec:	685a      	ldr	r2, [r3, #4]
  8000fee:	69bb      	ldr	r3, [r7, #24]
  8000ff0:	429a      	cmp	r2, r3
- 8000ff2:	d905      	bls.n	8001000 <RTOS_threadCreate+0x1a4>
+ 8000ff2:	d905      	bls.n	8001000 <RTOS_taskCreate+0x1a4>
 	{
 		/* Invoke a pendSV exception */
 	    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
- 8000ff4:	4a08      	ldr	r2, [pc, #32]	; (8001018 <RTOS_threadCreate+0x1bc>)
- 8000ff6:	4b08      	ldr	r3, [pc, #32]	; (8001018 <RTOS_threadCreate+0x1bc>)
+ 8000ff4:	4a08      	ldr	r2, [pc, #32]	; (8001018 <RTOS_taskCreate+0x1bc>)
+ 8000ff6:	4b08      	ldr	r3, [pc, #32]	; (8001018 <RTOS_taskCreate+0x1bc>)
  8000ff8:	685b      	ldr	r3, [r3, #4]
  8000ffa:	f043 5380 	orr.w	r3, r3, #268435456	; 0x10000000
  8000ffe:	6053      	str	r3, [r2, #4]
@@ -2831,17 +2831,17 @@ void RTOS_threadCreate(RTOS_thread_t* pThread, RTOS_stack_t* pStack, uint32_t st
  8001014:	20001078 	.word	0x20001078
  8001018:	e000ed00 	.word	0xe000ed00
 
-0800101c <RTOS_threadGetRunning>:
+0800101c <RTOS_taskGetRunning>:
  *  None
  * Return:
- * 	Pointer to the running thread
+ * 	Pointer to the running task
  */
-RTOS_thread_t* RTOS_threadGetRunning(void)
+RTOS_task_t* RTOS_taskGetRunning(void)
 {
  800101c:	b480      	push	{r7}
  800101e:	af00      	add	r7, sp, #0
-	return pRunningThread;
- 8001020:	4b03      	ldr	r3, [pc, #12]	; (8001030 <RTOS_threadGetRunning+0x14>)
+	return pRunningTask;
+ 8001020:	4b03      	ldr	r3, [pc, #12]	; (8001030 <RTOS_taskGetRunning+0x14>)
  8001022:	681b      	ldr	r3, [r3, #0]
 }
  8001024:	4618      	mov	r0, r3
@@ -2851,75 +2851,75 @@ RTOS_thread_t* RTOS_threadGetRunning(void)
  800102e:	bf00      	nop
  8001030:	20001078 	.word	0x20001078
 
-08001034 <RTOS_threadAddToReadyList>:
- *  pThread -> The thread to be inserted in the ready list
+08001034 <RTOS_taskAddToReadyList>:
+ *  pTask -> The task to be inserted in the ready list
  * Return:
  * 	None
  */
-void RTOS_threadAddToReadyList(RTOS_thread_t* pThread)
+void RTOS_taskAddToReadyList(RTOS_task_t* pTask)
 {
  8001034:	b580      	push	{r7, lr}
  8001036:	b084      	sub	sp, #16
  8001038:	af00      	add	r7, sp, #0
  800103a:	6078      	str	r0, [r7, #4]
-	RTOS_listItem_t* pListItem = &pThread->listItem;
+	RTOS_listItem_t* pListItem = &pTask->listItem;
  800103c:	687b      	ldr	r3, [r7, #4]
  800103e:	3308      	adds	r3, #8
  8001040:	60fb      	str	r3, [r7, #12]
-	/* Add the thread to ready list */
-	RTOS_listInsertEnd(&RTOS_readyList[pThread->priority], pListItem);
+	/* Add the task to ready list */
+	RTOS_listInsertEnd(&RTOS_readyList[pTask->priority], pListItem);
  8001042:	687b      	ldr	r3, [r7, #4]
  8001044:	685b      	ldr	r3, [r3, #4]
  8001046:	011b      	lsls	r3, r3, #4
- 8001048:	4a14      	ldr	r2, [pc, #80]	; (800109c <RTOS_threadAddToReadyList+0x68>)
+ 8001048:	4a14      	ldr	r2, [pc, #80]	; (800109c <RTOS_taskAddToReadyList+0x68>)
  800104a:	4413      	add	r3, r2
  800104c:	68f9      	ldr	r1, [r7, #12]
  800104e:	4618      	mov	r0, r3
  8001050:	f7ff fb54 	bl	80006fc <RTOS_listInsertEnd>
-	/* Set the thread state as ready */
-	pThread->threadState = RTOS_THREADREADY;
+	/* Set the task state as ready */
+	pTask->taskState = RTOS_TASKREADY;
  8001054:	687b      	ldr	r3, [r7, #4]
  8001056:	2201      	movs	r2, #1
  8001058:	f883 2034 	strb.w	r2, [r3, #52]	; 0x34
-	/* Check if the thread has a new highest priority */
-	if(pThread->priority < currentTopPriority)
+	/* Check if the task has a new highest priority */
+	if(pTask->priority < currentTopPriority)
  800105c:	687b      	ldr	r3, [r7, #4]
  800105e:	685a      	ldr	r2, [r3, #4]
- 8001060:	4b0f      	ldr	r3, [pc, #60]	; (80010a0 <RTOS_threadAddToReadyList+0x6c>)
+ 8001060:	4b0f      	ldr	r3, [pc, #60]	; (80010a0 <RTOS_taskAddToReadyList+0x6c>)
  8001062:	681b      	ldr	r3, [r3, #0]
  8001064:	429a      	cmp	r2, r3
- 8001066:	d203      	bcs.n	8001070 <RTOS_threadAddToReadyList+0x3c>
+ 8001066:	d203      	bcs.n	8001070 <RTOS_taskAddToReadyList+0x3c>
 	{
 		/* Set the new top priority */
-		currentTopPriority = pThread->priority;
+		currentTopPriority = pTask->priority;
  8001068:	687b      	ldr	r3, [r7, #4]
  800106a:	685b      	ldr	r3, [r3, #4]
- 800106c:	4a0c      	ldr	r2, [pc, #48]	; (80010a0 <RTOS_threadAddToReadyList+0x6c>)
+ 800106c:	4a0c      	ldr	r2, [pc, #48]	; (80010a0 <RTOS_taskAddToReadyList+0x6c>)
  800106e:	6013      	str	r3, [r2, #0]
 	else
 	{
 
 	}
 
-	if(pRunningThread != NULL &&
- 8001070:	4b0c      	ldr	r3, [pc, #48]	; (80010a4 <RTOS_threadAddToReadyList+0x70>)
+	if(pRunningTask != NULL &&
+ 8001070:	4b0c      	ldr	r3, [pc, #48]	; (80010a4 <RTOS_taskAddToReadyList+0x70>)
  8001072:	681b      	ldr	r3, [r3, #0]
  8001074:	2b00      	cmp	r3, #0
- 8001076:	d00c      	beq.n	8001092 <RTOS_threadAddToReadyList+0x5e>
-	(pThread->priority < pRunningThread->priority))
+ 8001076:	d00c      	beq.n	8001092 <RTOS_taskAddToReadyList+0x5e>
+	(pTask->priority < pRunningTask->priority))
  8001078:	687b      	ldr	r3, [r7, #4]
  800107a:	685a      	ldr	r2, [r3, #4]
- 800107c:	4b09      	ldr	r3, [pc, #36]	; (80010a4 <RTOS_threadAddToReadyList+0x70>)
+ 800107c:	4b09      	ldr	r3, [pc, #36]	; (80010a4 <RTOS_taskAddToReadyList+0x70>)
  800107e:	681b      	ldr	r3, [r3, #0]
  8001080:	685b      	ldr	r3, [r3, #4]
-	if(pRunningThread != NULL &&
+	if(pRunningTask != NULL &&
  8001082:	429a      	cmp	r2, r3
- 8001084:	d205      	bcs.n	8001092 <RTOS_threadAddToReadyList+0x5e>
+ 8001084:	d205      	bcs.n	8001092 <RTOS_taskAddToReadyList+0x5e>
 	{
 		/* Invoke a pendSV exception */
 		SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
- 8001086:	4a08      	ldr	r2, [pc, #32]	; (80010a8 <RTOS_threadAddToReadyList+0x74>)
- 8001088:	4b07      	ldr	r3, [pc, #28]	; (80010a8 <RTOS_threadAddToReadyList+0x74>)
+ 8001086:	4a08      	ldr	r2, [pc, #32]	; (80010a8 <RTOS_taskAddToReadyList+0x74>)
+ 8001088:	4b07      	ldr	r3, [pc, #28]	; (80010a8 <RTOS_taskAddToReadyList+0x74>)
  800108a:	685b      	ldr	r3, [r3, #4]
  800108c:	f043 5380 	orr.w	r3, r3, #268435456	; 0x10000000
  8001090:	6053      	str	r3, [r2, #4]
@@ -2938,12 +2938,12 @@ void RTOS_threadAddToReadyList(RTOS_thread_t* pThread)
  80010a4:	20001078 	.word	0x20001078
  80010a8:	e000ed00 	.word	0xe000ed00
 
-080010ac <RTOS_threadAddToTimerList>:
+080010ac <RTOS_taskAddToTimerList>:
  *  waitTicks -> Number of systicks to be delayed
  * Return:
  * 	None
  */
-void RTOS_threadAddToTimerList(RTOS_thread_t* pThread, uint32_t waitTicks)
+void RTOS_taskAddToTimerList(RTOS_task_t* pTask, uint32_t waitTicks)
 {
  80010ac:	b580      	push	{r7, lr}
  80010ae:	b084      	sub	sp, #16
@@ -2951,7 +2951,7 @@ void RTOS_threadAddToTimerList(RTOS_thread_t* pThread, uint32_t waitTicks)
  80010b2:	6078      	str	r0, [r7, #4]
  80010b4:	6039      	str	r1, [r7, #0]
 	/* Get the list item */
-	RTOS_listItem_t* pListItem = & pThread->listItem;
+	RTOS_listItem_t* pListItem = & pTask->listItem;
  80010b6:	687b      	ldr	r3, [r7, #4]
  80010b8:	3308      	adds	r3, #8
  80010ba:	60fb      	str	r3, [r7, #12]
@@ -2965,15 +2965,15 @@ void RTOS_threadAddToTimerList(RTOS_thread_t* pThread, uint32_t waitTicks)
  80010c6:	68fb      	ldr	r3, [r7, #12]
  80010c8:	611a      	str	r2, [r3, #16]
 
-	/* Add the thread to the delayed list */
+	/* Add the task to the delayed list */
 	RTOS_listInsert(&RTOS_delayList, pListItem);
  80010ca:	68f9      	ldr	r1, [r7, #12]
- 80010cc:	4805      	ldr	r0, [pc, #20]	; (80010e4 <RTOS_threadAddToTimerList+0x38>)
+ 80010cc:	4805      	ldr	r0, [pc, #20]	; (80010e4 <RTOS_taskAddToTimerList+0x38>)
  80010ce:	f7ff fb46 	bl	800075e <RTOS_listInsert>
 
-	/* Set the thread state to blocked */
-	pRunningThread->threadState = RTOS_THREADBLOCKED;
- 80010d2:	4b05      	ldr	r3, [pc, #20]	; (80010e8 <RTOS_threadAddToTimerList+0x3c>)
+	/* Set the task state to blocked */
+	pRunningTask->taskState = RTOS_TASKBLOCKED;
+ 80010d2:	4b05      	ldr	r3, [pc, #20]	; (80010e8 <RTOS_taskAddToTimerList+0x3c>)
  80010d4:	681b      	ldr	r3, [r3, #0]
  80010d6:	2202      	movs	r2, #2
  80010d8:	f883 2034 	strb.w	r2, [r3, #52]	; 0x34
@@ -2985,111 +2985,111 @@ void RTOS_threadAddToTimerList(RTOS_thread_t* pThread, uint32_t waitTicks)
  80010e4:	2000117c 	.word	0x2000117c
  80010e8:	20001078 	.word	0x20001078
 
-080010ec <RTOS_threadSwitch>:
+080010ec <RTOS_taskSwitch>:
  *  None
  * Return:
  * 	None
  */
-void RTOS_threadSwitch(void)
+void RTOS_taskSwitch(void)
 {
  80010ec:	b480      	push	{r7}
  80010ee:	b083      	sub	sp, #12
  80010f0:	af00      	add	r7, sp, #0
 	/* Check if the current top priority list became empty */
 	while(RTOS_readyList[currentTopPriority].numListItems == 0)
- 80010f2:	e004      	b.n	80010fe <RTOS_threadSwitch+0x12>
+ 80010f2:	e004      	b.n	80010fe <RTOS_taskSwitch+0x12>
 	{
 		currentTopPriority++;
- 80010f4:	4b27      	ldr	r3, [pc, #156]	; (8001194 <RTOS_threadSwitch+0xa8>)
+ 80010f4:	4b27      	ldr	r3, [pc, #156]	; (8001194 <RTOS_taskSwitch+0xa8>)
  80010f6:	681b      	ldr	r3, [r3, #0]
  80010f8:	3301      	adds	r3, #1
- 80010fa:	4a26      	ldr	r2, [pc, #152]	; (8001194 <RTOS_threadSwitch+0xa8>)
+ 80010fa:	4a26      	ldr	r2, [pc, #152]	; (8001194 <RTOS_taskSwitch+0xa8>)
  80010fc:	6013      	str	r3, [r2, #0]
 	while(RTOS_readyList[currentTopPriority].numListItems == 0)
- 80010fe:	4b25      	ldr	r3, [pc, #148]	; (8001194 <RTOS_threadSwitch+0xa8>)
+ 80010fe:	4b25      	ldr	r3, [pc, #148]	; (8001194 <RTOS_taskSwitch+0xa8>)
  8001100:	681b      	ldr	r3, [r3, #0]
- 8001102:	4a25      	ldr	r2, [pc, #148]	; (8001198 <RTOS_threadSwitch+0xac>)
+ 8001102:	4a25      	ldr	r2, [pc, #148]	; (8001198 <RTOS_taskSwitch+0xac>)
  8001104:	011b      	lsls	r3, r3, #4
  8001106:	4413      	add	r3, r2
  8001108:	330c      	adds	r3, #12
  800110a:	681b      	ldr	r3, [r3, #0]
  800110c:	2b00      	cmp	r3, #0
- 800110e:	d0f1      	beq.n	80010f4 <RTOS_threadSwitch+0x8>
+ 800110e:	d0f1      	beq.n	80010f4 <RTOS_taskSwitch+0x8>
 	}
 
-	/* Get the next thread in the list */
+	/* Get the next task in the list */
 	RTOS_readyList[currentTopPriority].pIndex = RTOS_readyList[currentTopPriority].pIndex->pNext;
- 8001110:	4b20      	ldr	r3, [pc, #128]	; (8001194 <RTOS_threadSwitch+0xa8>)
+ 8001110:	4b20      	ldr	r3, [pc, #128]	; (8001194 <RTOS_taskSwitch+0xa8>)
  8001112:	681b      	ldr	r3, [r3, #0]
- 8001114:	4a1f      	ldr	r2, [pc, #124]	; (8001194 <RTOS_threadSwitch+0xa8>)
+ 8001114:	4a1f      	ldr	r2, [pc, #124]	; (8001194 <RTOS_taskSwitch+0xa8>)
  8001116:	6812      	ldr	r2, [r2, #0]
- 8001118:	491f      	ldr	r1, [pc, #124]	; (8001198 <RTOS_threadSwitch+0xac>)
+ 8001118:	491f      	ldr	r1, [pc, #124]	; (8001198 <RTOS_taskSwitch+0xac>)
  800111a:	0112      	lsls	r2, r2, #4
  800111c:	440a      	add	r2, r1
  800111e:	6812      	ldr	r2, [r2, #0]
  8001120:	6812      	ldr	r2, [r2, #0]
- 8001122:	491d      	ldr	r1, [pc, #116]	; (8001198 <RTOS_threadSwitch+0xac>)
+ 8001122:	491d      	ldr	r1, [pc, #116]	; (8001198 <RTOS_taskSwitch+0xac>)
  8001124:	011b      	lsls	r3, r3, #4
  8001126:	440b      	add	r3, r1
  8001128:	601a      	str	r2, [r3, #0]
 
 	/* Check if the current index is the end item */
 	if(RTOS_readyList[currentTopPriority].pIndex == (RTOS_listItem_t*) &RTOS_readyList[currentTopPriority].endItem)
- 800112a:	4b1a      	ldr	r3, [pc, #104]	; (8001194 <RTOS_threadSwitch+0xa8>)
+ 800112a:	4b1a      	ldr	r3, [pc, #104]	; (8001194 <RTOS_taskSwitch+0xa8>)
  800112c:	681b      	ldr	r3, [r3, #0]
- 800112e:	4a1a      	ldr	r2, [pc, #104]	; (8001198 <RTOS_threadSwitch+0xac>)
+ 800112e:	4a1a      	ldr	r2, [pc, #104]	; (8001198 <RTOS_taskSwitch+0xac>)
  8001130:	011b      	lsls	r3, r3, #4
  8001132:	4413      	add	r3, r2
  8001134:	681a      	ldr	r2, [r3, #0]
- 8001136:	4b17      	ldr	r3, [pc, #92]	; (8001194 <RTOS_threadSwitch+0xa8>)
+ 8001136:	4b17      	ldr	r3, [pc, #92]	; (8001194 <RTOS_taskSwitch+0xa8>)
  8001138:	681b      	ldr	r3, [r3, #0]
  800113a:	011b      	lsls	r3, r3, #4
- 800113c:	4916      	ldr	r1, [pc, #88]	; (8001198 <RTOS_threadSwitch+0xac>)
+ 800113c:	4916      	ldr	r1, [pc, #88]	; (8001198 <RTOS_taskSwitch+0xac>)
  800113e:	440b      	add	r3, r1
  8001140:	3304      	adds	r3, #4
  8001142:	429a      	cmp	r2, r3
- 8001144:	d10c      	bne.n	8001160 <RTOS_threadSwitch+0x74>
+ 8001144:	d10c      	bne.n	8001160 <RTOS_taskSwitch+0x74>
 	{
 		/* Increment the index */
 		RTOS_readyList[currentTopPriority].pIndex = RTOS_readyList[currentTopPriority].pIndex->pNext;
- 8001146:	4b13      	ldr	r3, [pc, #76]	; (8001194 <RTOS_threadSwitch+0xa8>)
+ 8001146:	4b13      	ldr	r3, [pc, #76]	; (8001194 <RTOS_taskSwitch+0xa8>)
  8001148:	681b      	ldr	r3, [r3, #0]
- 800114a:	4a12      	ldr	r2, [pc, #72]	; (8001194 <RTOS_threadSwitch+0xa8>)
+ 800114a:	4a12      	ldr	r2, [pc, #72]	; (8001194 <RTOS_taskSwitch+0xa8>)
  800114c:	6812      	ldr	r2, [r2, #0]
- 800114e:	4912      	ldr	r1, [pc, #72]	; (8001198 <RTOS_threadSwitch+0xac>)
+ 800114e:	4912      	ldr	r1, [pc, #72]	; (8001198 <RTOS_taskSwitch+0xac>)
  8001150:	0112      	lsls	r2, r2, #4
  8001152:	440a      	add	r2, r1
  8001154:	6812      	ldr	r2, [r2, #0]
  8001156:	6812      	ldr	r2, [r2, #0]
- 8001158:	490f      	ldr	r1, [pc, #60]	; (8001198 <RTOS_threadSwitch+0xac>)
+ 8001158:	490f      	ldr	r1, [pc, #60]	; (8001198 <RTOS_taskSwitch+0xac>)
  800115a:	011b      	lsls	r3, r3, #4
  800115c:	440b      	add	r3, r1
  800115e:	601a      	str	r2, [r3, #0]
 	}
 
-	RTOS_thread_t* pThread = RTOS_readyList[currentTopPriority].pIndex->pThread;
- 8001160:	4b0c      	ldr	r3, [pc, #48]	; (8001194 <RTOS_threadSwitch+0xa8>)
+	RTOS_task_t* pTask = RTOS_readyList[currentTopPriority].pIndex->pTask;
+ 8001160:	4b0c      	ldr	r3, [pc, #48]	; (8001194 <RTOS_taskSwitch+0xa8>)
  8001162:	681b      	ldr	r3, [r3, #0]
- 8001164:	4a0c      	ldr	r2, [pc, #48]	; (8001198 <RTOS_threadSwitch+0xac>)
+ 8001164:	4a0c      	ldr	r2, [pc, #48]	; (8001198 <RTOS_taskSwitch+0xac>)
  8001166:	011b      	lsls	r3, r3, #4
  8001168:	4413      	add	r3, r2
  800116a:	681b      	ldr	r3, [r3, #0]
  800116c:	68db      	ldr	r3, [r3, #12]
  800116e:	607b      	str	r3, [r7, #4]
 
-	/* Set the currently running thread */
-	pRunningThread = pThread;
- 8001170:	4a0a      	ldr	r2, [pc, #40]	; (800119c <RTOS_threadSwitch+0xb0>)
+	/* Set the currently running task */
+	pRunningTask = pTask;
+ 8001170:	4a0a      	ldr	r2, [pc, #40]	; (800119c <RTOS_taskSwitch+0xb0>)
  8001172:	687b      	ldr	r3, [r7, #4]
  8001174:	6013      	str	r3, [r2, #0]
-	runningThreadID = pThread->threadId;
+	runningTaskID = pTask->taskId;
  8001176:	687b      	ldr	r3, [r7, #4]
  8001178:	6b1b      	ldr	r3, [r3, #48]	; 0x30
- 800117a:	4a09      	ldr	r2, [pc, #36]	; (80011a0 <RTOS_threadSwitch+0xb4>)
+ 800117a:	4a09      	ldr	r2, [pc, #36]	; (80011a0 <RTOS_taskSwitch+0xb4>)
  800117c:	6013      	str	r3, [r2, #0]
 
-	/* Set the thread state to running */
-	pThread->threadState = RTOS_THREADRUNNING;
+	/* Set the task state to running */
+	pTask->taskState = RTOS_TASKRUNNING;
  800117e:	687b      	ldr	r3, [r7, #4]
  8001180:	2200      	movs	r2, #0
  8001182:	f883 2034 	strb.w	r2, [r3, #52]	; 0x34
@@ -3105,20 +3105,20 @@ void RTOS_threadSwitch(void)
  800119c:	20001078 	.word	0x20001078
  80011a0:	20000004 	.word	0x20000004
 
-080011a4 <RTOS_threadDelay>:
+080011a4 <RTOS_taskDelay>:
  *  waitTicks -> Number of system ticks to be delayed
  * Return:
  * 	None
  */
-void RTOS_threadDelay(uint32_t waitTicks)
+void RTOS_taskDelay(uint32_t waitTicks)
 {
  80011a4:	b580      	push	{r7, lr}
  80011a6:	b084      	sub	sp, #16
  80011a8:	af00      	add	r7, sp, #0
  80011aa:	6078      	str	r0, [r7, #4]
-	/* Remove the current thread from ready list */
-	RTOS_listItem_t* pListItem = & pRunningThread->listItem;
- 80011ac:	4b0b      	ldr	r3, [pc, #44]	; (80011dc <RTOS_threadDelay+0x38>)
+	/* Remove the current task from ready list */
+	RTOS_listItem_t* pListItem = & pRunningTask->listItem;
+ 80011ac:	4b0b      	ldr	r3, [pc, #44]	; (80011dc <RTOS_taskDelay+0x38>)
  80011ae:	681b      	ldr	r3, [r3, #0]
  80011b0:	3308      	adds	r3, #8
  80011b2:	60fb      	str	r3, [r7, #12]
@@ -3126,18 +3126,18 @@ void RTOS_threadDelay(uint32_t waitTicks)
  80011b4:	68f8      	ldr	r0, [r7, #12]
  80011b6:	f7ff fb11 	bl	80007dc <RTOS_listRemove>
 
-	/* Add the thread to timer list */
-	RTOS_threadAddToTimerList(pListItem->pThread, waitTicks);
+	/* Add the task to timer list */
+	RTOS_taskAddToTimerList(pListItem->pTask, waitTicks);
  80011ba:	68fb      	ldr	r3, [r7, #12]
  80011bc:	68db      	ldr	r3, [r3, #12]
  80011be:	6879      	ldr	r1, [r7, #4]
  80011c0:	4618      	mov	r0, r3
- 80011c2:	f7ff ff73 	bl	80010ac <RTOS_threadAddToTimerList>
+ 80011c2:	f7ff ff73 	bl	80010ac <RTOS_taskAddToTimerList>
 
 	/* Invoke a pendSV exception */
     SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
- 80011c6:	4a06      	ldr	r2, [pc, #24]	; (80011e0 <RTOS_threadDelay+0x3c>)
- 80011c8:	4b05      	ldr	r3, [pc, #20]	; (80011e0 <RTOS_threadDelay+0x3c>)
+ 80011c6:	4a06      	ldr	r2, [pc, #24]	; (80011e0 <RTOS_taskDelay+0x3c>)
+ 80011c8:	4b05      	ldr	r3, [pc, #20]	; (80011e0 <RTOS_taskDelay+0x3c>)
  80011ca:	685b      	ldr	r3, [r3, #4]
  80011cc:	f043 5380 	orr.w	r3, r3, #268435456	; 0x10000000
  80011d0:	6053      	str	r3, [r2, #4]
@@ -3150,25 +3150,25 @@ void RTOS_threadDelay(uint32_t waitTicks)
  80011dc:	20001078 	.word	0x20001078
  80011e0:	e000ed00 	.word	0xe000ed00
 
-080011e4 <RTOS_threadDelayCheck>:
+080011e4 <RTOS_taskDelayCheck>:
  *  None
  * Return:
  * 	None
  */
-void RTOS_threadDelayCheck(void)
+void RTOS_taskDelayCheck(void)
 {
  80011e4:	b590      	push	{r4, r7, lr}
  80011e6:	b083      	sub	sp, #12
  80011e8:	af00      	add	r7, sp, #0
 	if(RTOS_delayList.numListItems > 0)
- 80011ea:	4b0d      	ldr	r3, [pc, #52]	; (8001220 <RTOS_threadDelayCheck+0x3c>)
+ 80011ea:	4b0d      	ldr	r3, [pc, #52]	; (8001220 <RTOS_taskDelayCheck+0x3c>)
  80011ec:	68db      	ldr	r3, [r3, #12]
  80011ee:	2b00      	cmp	r3, #0
- 80011f0:	d011      	beq.n	8001216 <RTOS_threadDelayCheck+0x32>
+ 80011f0:	d011      	beq.n	8001216 <RTOS_taskDelayCheck+0x32>
 	{
-		/* Check for delayed threads */
+		/* Check for delayed tasks */
 		RTOS_listItem_t* pListItem = RTOS_delayList.endItem.pPrev;
- 80011f2:	4b0b      	ldr	r3, [pc, #44]	; (8001220 <RTOS_threadDelayCheck+0x3c>)
+ 80011f2:	4b0b      	ldr	r3, [pc, #44]	; (8001220 <RTOS_taskDelayCheck+0x3c>)
  80011f4:	689b      	ldr	r3, [r3, #8]
  80011f6:	607b      	str	r3, [r7, #4]
 		if(pListItem->orderValue <= RTOS_schedulerGetSystickCount())
@@ -3177,19 +3177,19 @@ void RTOS_threadDelayCheck(void)
  80011fc:	f7ff fce4 	bl	8000bc8 <RTOS_schedulerGetSystickCount>
  8001200:	4603      	mov	r3, r0
  8001202:	429c      	cmp	r4, r3
- 8001204:	d807      	bhi.n	8001216 <RTOS_threadDelayCheck+0x32>
+ 8001204:	d807      	bhi.n	8001216 <RTOS_taskDelayCheck+0x32>
 		{
-			/* Remove the current thread from delay list */
+			/* Remove the current task from delay list */
 			RTOS_listRemove(pListItem);
  8001206:	6878      	ldr	r0, [r7, #4]
  8001208:	f7ff fae8 	bl	80007dc <RTOS_listRemove>
 
-			/* Add the thread to the ready list */
-			RTOS_threadAddToReadyList(pListItem->pThread);
+			/* Add the task to the ready list */
+			RTOS_taskAddToReadyList(pListItem->pTask);
  800120c:	687b      	ldr	r3, [r7, #4]
  800120e:	68db      	ldr	r3, [r3, #12]
  8001210:	4618      	mov	r0, r3
- 8001212:	f7ff ff0f 	bl	8001034 <RTOS_threadAddToReadyList>
+ 8001212:	f7ff ff0f 	bl	8001034 <RTOS_taskAddToReadyList>
 		}
 	}
 	else
@@ -3203,39 +3203,39 @@ void RTOS_threadDelayCheck(void)
  800121e:	bf00      	nop
  8001220:	2000117c 	.word	0x2000117c
 
-08001224 <RTOS_threadTerminate>:
- *  pThread -> Pointer to the thread to be deleted
+08001224 <RTOS_taskTerminate>:
+ *  pTask -> Pointer to the task to be deleted
  * Return:
  * 	None
  */
-void RTOS_threadTerminate(RTOS_thread_t* pThread)
+void RTOS_taskTerminate(RTOS_task_t* pTask)
 {
  8001224:	b580      	push	{r7, lr}
  8001226:	b082      	sub	sp, #8
  8001228:	af00      	add	r7, sp, #0
  800122a:	6078      	str	r0, [r7, #4]
 
-	if(pThread == NULL)
+	if(pTask == NULL)
  800122c:	687b      	ldr	r3, [r7, #4]
  800122e:	2b00      	cmp	r3, #0
- 8001230:	d102      	bne.n	8001238 <RTOS_threadTerminate+0x14>
+ 8001230:	d102      	bne.n	8001238 <RTOS_taskTerminate+0x14>
 	{
-		pThread = pRunningThread;
- 8001232:	4b14      	ldr	r3, [pc, #80]	; (8001284 <RTOS_threadTerminate+0x60>)
+		pTask = pRunningTask;
+ 8001232:	4b14      	ldr	r3, [pc, #80]	; (8001284 <RTOS_taskTerminate+0x60>)
  8001234:	681b      	ldr	r3, [r3, #0]
  8001236:	607b      	str	r3, [r7, #4]
 	{
 
 	}
 
-	/* Remove the threads items from any lists */
-	if(pThread->listItem.pList != NULL)
+	/* Remove the tasks items from any lists */
+	if(pTask->listItem.pList != NULL)
  8001238:	687b      	ldr	r3, [r7, #4]
  800123a:	691b      	ldr	r3, [r3, #16]
  800123c:	2b00      	cmp	r3, #0
- 800123e:	d004      	beq.n	800124a <RTOS_threadTerminate+0x26>
+ 800123e:	d004      	beq.n	800124a <RTOS_taskTerminate+0x26>
 	{
-		RTOS_listRemove(& pThread->listItem);
+		RTOS_listRemove(& pTask->listItem);
  8001240:	687b      	ldr	r3, [r7, #4]
  8001242:	3308      	adds	r3, #8
  8001244:	4618      	mov	r0, r3
@@ -3245,13 +3245,13 @@ void RTOS_threadTerminate(RTOS_thread_t* pThread)
 	}
 
 
-	if(pThread->eventListItem.pList != NULL)
+	if(pTask->eventListItem.pList != NULL)
  800124a:	687b      	ldr	r3, [r7, #4]
  800124c:	6a5b      	ldr	r3, [r3, #36]	; 0x24
  800124e:	2b00      	cmp	r3, #0
- 8001250:	d004      	beq.n	800125c <RTOS_threadTerminate+0x38>
+ 8001250:	d004      	beq.n	800125c <RTOS_taskTerminate+0x38>
 	{
-		RTOS_listRemove(& pThread->eventListItem);
+		RTOS_listRemove(& pTask->eventListItem);
  8001252:	687b      	ldr	r3, [r7, #4]
  8001254:	331c      	adds	r3, #28
  8001256:	4618      	mov	r0, r3
@@ -3260,24 +3260,24 @@ void RTOS_threadTerminate(RTOS_thread_t* pThread)
 
 	}
 
-	/* Set the thread as terminated */
-	pThread->threadState = RTOS_THREADTERMINATED;
+	/* Set the task as terminated */
+	pTask->taskState = RTOS_TASKTERMINATED;
  800125c:	687b      	ldr	r3, [r7, #4]
  800125e:	2203      	movs	r2, #3
  8001260:	f883 2034 	strb.w	r2, [r3, #52]	; 0x34
 
-	/* If the thread is the current running thread */
-	if(pThread == pRunningThread)
- 8001264:	4b07      	ldr	r3, [pc, #28]	; (8001284 <RTOS_threadTerminate+0x60>)
+	/* If the task is the current running task */
+	if(pTask == pRunningTask)
+ 8001264:	4b07      	ldr	r3, [pc, #28]	; (8001284 <RTOS_taskTerminate+0x60>)
  8001266:	681b      	ldr	r3, [r3, #0]
  8001268:	687a      	ldr	r2, [r7, #4]
  800126a:	429a      	cmp	r2, r3
- 800126c:	d105      	bne.n	800127a <RTOS_threadTerminate+0x56>
+ 800126c:	d105      	bne.n	800127a <RTOS_taskTerminate+0x56>
 	{
 		/* Invoke a pendSV exception */
 	    SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;
- 800126e:	4a06      	ldr	r2, [pc, #24]	; (8001288 <RTOS_threadTerminate+0x64>)
- 8001270:	4b05      	ldr	r3, [pc, #20]	; (8001288 <RTOS_threadTerminate+0x64>)
+ 800126e:	4a06      	ldr	r2, [pc, #24]	; (8001288 <RTOS_taskTerminate+0x64>)
+ 8001270:	4b05      	ldr	r3, [pc, #20]	; (8001288 <RTOS_taskTerminate+0x64>)
  8001272:	685b      	ldr	r3, [r3, #4]
  8001274:	f043 5380 	orr.w	r3, r3, #268435456	; 0x10000000
  8001278:	6053      	str	r3, [r2, #4]
@@ -3717,9 +3717,9 @@ void func_2(void)
  80014cc:	4804      	ldr	r0, [pc, #16]	; (80014e0 <func_2+0x4c>)
  80014ce:	f7ff ff6b 	bl	80013a8 <GPIO_SetBits>
 		}
-		RTOS_SVC_threadDelay(1000);
+		RTOS_SVC_taskDelay(1000);
  80014d2:	f44f 707a 	mov.w	r0, #1000	; 0x3e8
- 80014d6:	f7fe fecd 	bl	8000274 <RTOS_SVC_threadDelay>
+ 80014d6:	f7fe fecd 	bl	8000274 <RTOS_SVC_taskDelay>
 		if(RTOS_SVC_mailBoxReceive(&mailbox, &val, RTOS_WAITFOREVER) == RTOS_SUCCESS)
  80014da:	e7de      	b.n	800149a <func_2+0x6>
  80014dc:	20001198 	.word	0x20001198
@@ -3756,22 +3756,22 @@ int main(void)
 	RTOS_init();
  8001508:	f7fe ff5a 	bl	80003c0 <RTOS_init>
 
-	RTOS_SVC_threadCreate(&thread[0], stack[0], 512, func_1, 1);
+	RTOS_SVC_taskCreate(&task[0], stack[0], 512, func_1, 1);
  800150c:	2301      	movs	r3, #1
  800150e:	9300      	str	r3, [sp, #0]
  8001510:	4b0e      	ldr	r3, [pc, #56]	; (800154c <main+0x68>)
  8001512:	f44f 7200 	mov.w	r2, #512	; 0x200
  8001516:	490e      	ldr	r1, [pc, #56]	; (8001550 <main+0x6c>)
  8001518:	480e      	ldr	r0, [pc, #56]	; (8001554 <main+0x70>)
- 800151a:	f7fe fea9 	bl	8000270 <RTOS_SVC_threadCreate>
-	RTOS_SVC_threadCreate(&thread[1], stack[1], 512, func_2, 1);
+ 800151a:	f7fe fea9 	bl	8000270 <RTOS_SVC_taskCreate>
+	RTOS_SVC_taskCreate(&task[1], stack[1], 512, func_2, 1);
  800151e:	2301      	movs	r3, #1
  8001520:	9300      	str	r3, [sp, #0]
  8001522:	4b0d      	ldr	r3, [pc, #52]	; (8001558 <main+0x74>)
  8001524:	f44f 7200 	mov.w	r2, #512	; 0x200
  8001528:	490c      	ldr	r1, [pc, #48]	; (800155c <main+0x78>)
  800152a:	480d      	ldr	r0, [pc, #52]	; (8001560 <main+0x7c>)
- 800152c:	f7fe fea0 	bl	8000270 <RTOS_SVC_threadCreate>
+ 800152c:	f7fe fea0 	bl	8000270 <RTOS_SVC_taskCreate>
 
 	RTOS_SVC_mailBoxInit(&mailbox, &buffer, 10, 1);
  8001530:	2301      	movs	r3, #1
@@ -3788,12 +3788,12 @@ int main(void)
  8001544:	080018d4 	.word	0x080018d4
  8001548:	40021800 	.word	0x40021800
  800154c:	08001455 	.word	0x08001455
- 8001550:	20001258 	.word	0x20001258
- 8001554:	200011e8 	.word	0x200011e8
+ 8001550:	200011e8 	.word	0x200011e8
+ 8001554:	200031f4 	.word	0x200031f4
  8001558:	08001495 	.word	0x08001495
- 800155c:	20002258 	.word	0x20002258
- 8001560:	20001220 	.word	0x20001220
- 8001564:	20003258 	.word	0x20003258
+ 800155c:	200021e8 	.word	0x200021e8
+ 8001560:	2000322c 	.word	0x2000322c
+ 8001564:	200031e8 	.word	0x200031e8
  8001568:	20001198 	.word	0x20001198
 
 0800156c <Reset_Handler>:

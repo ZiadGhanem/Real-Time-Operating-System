@@ -1,0 +1,9 @@
+rtos_task.c:30:6:RTOS_taskListsInit	16	static
+rtos_task.c:51:6:RTOS_taskCreate	24	static
+rtos_task.c:167:14:RTOS_taskGetRunning	4	static
+rtos_task.c:179:6:RTOS_taskAddToReadyList	24	static
+rtos_task.c:216:6:RTOS_taskAddToTimerList	24	static
+rtos_task.c:239:6:RTOS_taskSwitch	16	static
+rtos_task.c:275:6:RTOS_taskDelay	24	static
+rtos_task.c:295:6:RTOS_taskDelayCheck	24	static
+rtos_task.c:328:6:RTOS_taskTerminate	16	static
