@@ -40,7 +40,7 @@ void RTOS_SVC_taskCreate(RTOS_task_t* pTask, RTOS_stack_t* pStack, uint32_t stac
 > Create a new task and add it to the list of tasks that are ready to run. The stack has to be statically allocated by the user.
 
 ```c
-RTOS_SVC_taskDelay(uint32_t waitTicks);
+void RTOS_SVC_taskDelay(uint32_t waitTicks);
 ```
 > Delay a task for a given number of ticks. The actual time that the task remains blocked depends on the tick rate.
 
@@ -138,4 +138,4 @@ RTOS_returnStatus RTOS_SVC_mailBoxReceive(RTOS_mailBox_t* pMailBox, void* pBuffe
 
 - Operating Systems, Internals and Design Principles, Ninth Edition (Global Edition), By William Stallings.
 - [ARM Cortex-M4 Course, By Ahmed Eldeep.](https://www.youtube.com/playlist?list=PLPFp2zIiTnxXjxS-tC0u6m5zuSSJ1NLFw)
-- [Quantul Leeps, LLC.](https://www.youtube.com/c/StateMachineCOM/featured)
+- [Quantum Leeps, LLC.](https://www.youtube.com/c/StateMachineCOM/featured)

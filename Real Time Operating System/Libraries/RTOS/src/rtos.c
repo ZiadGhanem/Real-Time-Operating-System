@@ -9,6 +9,7 @@
 #include "rtos.h"
 #include "rtos_list.h"
 #include "rtos_scheduler.h"
+#include "rtos_bsemaphore.h"
 #include "rtos_semaphore.h"
 #include "rtos_mutex.h"
 #include "rtos_spinlock.h"
@@ -140,6 +141,16 @@ void RTOS_SVC_Handler_Main(uint32_t* svc_args)
 		case 15:
 			returnStatus = RTOS_mailBoxReceive((RTOS_mailBox_t*)  svc_args[0], (void*) svc_args[1], (uint32_t) svc_args[2]);
 			break;
+		/* Binary Semaphore */
+		case 16:
+			RTOS_bSemaphoreInit((RTOS_bSemaphore_t*) svc_args[0], (int32_t)svc_args[1]);
+			break;
+		case 17:
+			returnStatus = RTOS_bSemaphoreWait((RTOS_bSemaphore_t*) svc_args[0], (uint32_t) svc_args[1]);
+			break;
+		case 18:
+			RTOS_bSemaphoreSignal((RTOS_bSemaphore_t*) svc_args[0]);
+			break;
 		/* Unsupported supervisor call */
 		default:
 			ASSERT(0)
@@ -151,6 +162,7 @@ void RTOS_SVC_Handler_Main(uint32_t* svc_args)
 		/* For semaphores, mutex*/
 		case 5:
 		case 8:
+		case 17:
 			/* If we failed to acquire the synchronization tool */
 			if(returnStatus == RTOS_DELAY)
 			{

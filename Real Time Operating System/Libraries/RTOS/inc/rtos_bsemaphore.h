@@ -24,7 +24,7 @@ typedef struct{
 }RTOS_bSemaphore_t;
 
 void RTOS_SVC_bSemaphoreInit(RTOS_bSemaphore_t* pBSemaphore, uint32_t value);
-RTOS_returnStatus bSemaphoreWait(RTOS_bSemaphore_t* pBSemaphore, uint32_t waitTicks);
+RTOS_returnStatus RTOS_SVC_bSemaphoreWait(RTOS_bSemaphore_t* pBSemaphore, uint32_t waitTicks);
 void RTOS_SVC_bSemaphoreSignal(RTOS_bSemaphore_t* pBSemaphore);
 
 void RTOS_bSemaphoreInit(RTOS_bSemaphore_t* pBSemaphore, uint32_t value);
