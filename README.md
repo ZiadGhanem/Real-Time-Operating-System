@@ -62,14 +62,14 @@ void RTOS_SVC_semaphoreInit(RTOS_semaphore_t* pSemaphore, uint32_t value);
 > Creates a Binary/Counting Semaphore with the desired initial count value.
 
 ```c
-RTOS_returnStatus bSemaphoreWait(RTOS_bSemaphore_t* pBSemaphore, uint32_t waitTicks);
+RTOS_returnStatus RTOS_SVC_bSemaphoreWait(RTOS_bSemaphore_t* pBSemaphore, uint32_t waitTicks);
 RTOS_returnStatus RTOS_SVC_semaphoreWait(RTOS_semaphore_t* pSemaphore, uint32_t waitTicks);
 ```
 > Attempts to take the semaphore, If the semaphore is not available it waits for the waitTicks value to see if it becomes free. waitTicks = RTOS_WAITFOREVER can be used to block the task until signal() is used. If waitTicks = 0 the call will return immediately if it fails to acquire the semaphore.
 
 ```c
 void RTOS_SVC_bSemaphoreSignal(RTOS_bSemaphore_t* pBSemaphore);
-void RTOS_semaphoreSignal(RTOS_semaphore_t* pSemaphore);
+void RTOS_SVC_semaphoreSignal(RTOS_semaphore_t* pSemaphore);
 
 ```
 > Used to release a semaphore.
